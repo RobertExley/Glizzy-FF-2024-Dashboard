@@ -12,9 +12,7 @@ It should lead to this message:
 
 The prompt you're seeing is Streamlit's first-time setup.
 Skip the email signup:
-  Just press Enter without typing anything.
-  
-  This will skip the email collection and launch your dashboard
+  Just press Enter without typing anything. This will skip the email collection and launch your dashboard
 
 ________
 
