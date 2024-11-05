@@ -1,6 +1,6 @@
 # Glizzy-FF-2024-Dashboard
 
-To open host the dashboard locally, input the following into Powershell. 
+To host the dashboard locally, input the following into Powershell. 
 1. Navigate to the correct file directory first (in my case): cd C:\Users\hoon\Desktop
 2. python -m streamlit run fantasy_dashboard.py
 
