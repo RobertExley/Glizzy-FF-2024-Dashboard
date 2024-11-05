@@ -18,3 +18,9 @@ Skip the email signup:
 ________
 
 **Current iteration as of 11:15 AM, 11/05/2024**
+
+
+
+
+________
+**Week 1 - 9 Report**: https://docs.google.com/document/d/1zhu27Sl9BvwjwT5Eqkagxn2Lh7MejwqEAkzI0UYo3cM/edit?tab=t.0
