@@ -18,6 +18,54 @@ ________
 
 **Current iteration as of 11:15 AM, 11/05/2024**
 
+**PART 1 - CORE STATISTICAL CALCULATIONS**
+
+1. Basic Statistics:
+
+Avg PF (Points For):
+- Raw mean of all weekly scores
+- Purpose: Baseline measure of scoring power
+- Limitation: Can be skewed by outliers
+Example: Team scores [100, 100, 100, 180]
+Avg PF = 120, but not representative of typical performance
+
+Median PF:
+- Middle value of all scores when ordered
+- Purpose: Shows "typical" performance level
+- Value: Less affected by outliers
+Example: Same team [100, 100, 100, 180]
+Median PF = 100, better shows usual performance
+
+Mean-Median Gap:
+- Calculation: Avg PF - Median PF
+- Purpose: Identifies scoring distribution skew
+- Interpretation:
+  * Large Positive Gap: Some huge scoring weeks
+  * Small Gap: Consistent scoring
+  * Negative Gap: Few underperformance weeks
+Example: 
+[100, 100, 100, 180] → Gap = +20 (explosive)
+[100, 105, 110, 115] → Gap = +2.5 (consistent)
+
+2. Consistency Metrics:
+
+Standard Deviation (StdDev):
+- Measures score dispersion around mean
+- Lower = more consistent
+- Formula: sqrt(sum((x - mean)²)/n)
+
+Consistency Rating:
+- Based on StdDev thresholds:
+  * High: StdDev ≤ 20
+  * Medium: StdDev ≤ 25
+  * Low: StdDev > 25
+- Purpose: Simplified consistency indicator
+
+Stability Score:
+- Based on 3-week rolling averages
+- Higher score = more stable performance
+- Formula: 100 - (StdDev of rolling avg / Mean * 100)
+
 
 
 
