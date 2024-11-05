@@ -15,4 +15,6 @@ Skip the email signup:
   Just press Enter without typing anything
   This will skip the email collection and launch your dashboard
 
+________
+
 **Current iteration as of 11:15 AM, 11/05/2024**
