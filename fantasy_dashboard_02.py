@@ -72,6 +72,20 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Raw weekly scores
+weekly_scores = {
+    'Gautam': [110.86, 200.12, 126.26, 123.64, 163.68, 127.42, 120.96, 174.5, 165.1],
+    'hoon': [160.36, 132.82, 179.06, 113.28, 147.38, 165.62, 141.74, 146.86, 163.74],
+    'Azhar': [163.48, 110.76, 136.64, 119.3, 142.64, 140.1, 154.42, 137.14, 140.48],
+    'Abdullah': [108.68, 176.14, 137.18, 147.68, 143.62, 142.56, 119.34, 140.96, 131.96],
+    'Sangmin': [127.72, 124.08, 152.08, 123.92, 129.32, 117.62, 167.54, 103.76, 146],
+    'Veen': [170.26, 99.2, 99.9, 156.1, 135.84, 131.28, 75.74, 135.6, 168.4],
+    'Liam': [107.52, 139.72, 104.34, 174.22, 99.7, 97.46, 150.56, 170.44, 121],
+    'Yeef': [90.04, 141.44, 126.08, 98.8, 156.16, 144.32, 118.8, 151.64, 113.5],
+    'Neil': [126.6, 103.4, 115.38, 114.84, 135.34, 118.5, 109.46, 148.78, 135.44],
+    'Archer': [81.24, 114.16, 90.92, 97.92, 135.66, 125, 140.1, 158.6, 121.5]
+}
+
 # Weekly matchups data
 weekly_matchups = {
     1: [('hoon', 'Archer'), ('Abdullah', 'Gautam'), ('Yeef', 'Liam'), ('Veen', 'Neil'), ('Azhar', 'Sangmin')],
@@ -94,20 +108,6 @@ future_matchups = {
     14: [('hoon', 'Azhar'), ('Gautam', 'Liam'), ('Abdullah', 'Yeef'), ('Veen', 'Archer'), ('Neil', 'Sangmin')]
 }
 
-# Raw weekly scores
-weekly_scores = {
-    'Gautam': [110.86, 200.12, 126.26, 123.64, 163.68, 127.42, 120.96, 174.5, 165.1],
-    'hoon': [160.36, 132.82, 179.06, 113.28, 147.38, 165.62, 141.74, 146.86, 163.74],
-    'Azhar': [163.48, 110.76, 136.64, 119.3, 142.64, 140.1, 154.42, 137.14, 140.48],
-    'Abdullah': [108.68, 176.14, 137.18, 147.68, 143.62, 142.56, 119.34, 140.96, 131.96],
-    'Sangmin': [127.72, 124.08, 152.08, 123.92, 129.32, 117.62, 167.54, 103.76, 146],
-    'Veen': [170.26, 99.2, 99.9, 156.1, 135.84, 131.28, 75.74, 135.6, 168.4],
-    'Liam': [107.52, 139.72, 104.34, 174.22, 99.7, 97.46, 150.56, 170.44, 121],
-    'Yeef': [90.04, 141.44, 126.08, 98.8, 156.16, 144.32, 118.8, 151.64, 113.5],
-    'Neil': [126.6, 103.4, 115.38, 114.84, 135.34, 118.5, 109.46, 148.78, 135.44],
-    'Archer': [81.24, 114.16, 90.92, 97.92, 135.66, 125, 140.1, 158.6, 121.5]
-}
-
 # Actual wins
 actual_wins = {
     'Gautam': 8, 'hoon': 5, 'Azhar': 5, 'Abdullah': 4,
@@ -115,69 +115,19 @@ actual_wins = {
     'Neil': 4, 'Archer': 2
 }
 
-def calculate_enhanced_expected_wins(scores, all_weekly_scores):
-    """Calculate expected wins with sophisticated mean-median gap analysis"""
-    team_mean = np.mean(scores)
-    team_median = np.median(scores)
-    mean_median_gap = team_mean - team_median
-    
-    # Calculate weekly medians and league averages
-    weekly_medians = []
-    for week in range(len(scores)):
-        week_scores = [team_scores[week] for team_scores in all_weekly_scores.values()]
-        weekly_medians.append(np.median(week_scores))
-    
-    # Base expected wins calculation
-    base_expected_wins = sum(1 for i, score in enumerate(scores) if score > weekly_medians[i])
-    
-    # Calculate mean-median gap percentile
-    league_gaps = [np.mean(team_scores) - np.median(team_scores) 
-                  for team_scores in all_weekly_scores.values()]
-    gap_percentile = sum(1 for gap in league_gaps 
-                        if abs(gap) < abs(mean_median_gap)) / len(league_gaps)
-    
-    # Calculate adjustments based on gap analysis
-    if mean_median_gap > 0:  # Right-skewed distribution (occasional high scores)
-        gap_adjustment = -0.15 * gap_percentile * base_expected_wins
-    else:  # Left-skewed distribution (occasional low scores)
-        gap_adjustment = 0.15 * gap_percentile * base_expected_wins
-    
-    # Consistency adjustment
-    weekly_cv = np.std(scores) / np.mean(scores)
-    league_cvs = [np.std(team_scores) / np.mean(team_scores) 
-                 for team_scores in all_weekly_scores.values()]
-    avg_cv = np.mean(league_cvs)
-    consistency_adjustment = 0.1 * (avg_cv - weekly_cv) * base_expected_wins
-    
-    # Calculate final expected wins
-    enhanced_expected_wins = base_expected_wins + gap_adjustment + consistency_adjustment
-    
-    return max(0, min(len(scores), enhanced_expected_wins))
-
-def calculate_performance_trends(scores):
-    """Calculate performance trends and stability"""
-    rolling_avg = []
-    for i in range(len(scores)-2):
-        avg = np.mean(scores[i:i+3])
-        rolling_avg.append(avg)
-    
-    recent_trend = np.polyfit(range(4), scores[-4:], 1)[0]
-    
-    if abs(recent_trend) < 2:
-        trend = 'Stable'
-    elif recent_trend > 0:
-        trend = 'Improving'
-    else:
-        trend = 'Declining'
-    
-    stability = 100 - (np.std(rolling_avg) / np.mean(rolling_avg) * 100)
-    
-    return {
-        'rolling_averages': rolling_avg,
-        'trend': trend,
-        'stability': round(stability, 1),
-        'trend_strength': abs(recent_trend)
-    }
+# Weekly fractional records
+weekly_fractional_records = {
+    'Veen': [9, 0, 1, 8, 4, 5, 0, 1, 9],
+    'Azhar': [8, 2, 6, 4, 5, 6, 8, 2, 5],
+    'hoon': [7, 5, 9, 2, 7, 9, 6, 4, 7],
+    'Sangmin': [6, 4, 8, 6, 1, 1, 9, 0, 6],
+    'Neil': [5, 1, 3, 3, 2, 2, 1, 5, 4],
+    'Gautam': [4, 9, 5, 5, 5, 4, 4, 8, 8],
+    'Abdullah': [3, 8, 7, 7, 6, 7, 3, 3, 3],
+    'Liam': [2, 6, 2, 9, 0, 0, 7, 8, 2],
+    'Yeef': [1, 7, 4, 1, 8, 8, 2, 6, 0],
+    'Archer': [0, 3, 0, 0, 3, 3, 5, 7, 2]
+}
 
 def get_opponent_for_week(team, week, matchups_dict):
     """Get a team's opponent for a specific week"""
@@ -187,54 +137,86 @@ def get_opponent_for_week(team, week, matchups_dict):
             return matchup[0] if matchup[1] == team else matchup[1]
     return None
 
-def calculate_luck_score(team_name, weekly_scores, actual_wins, weekly_matchups):
-    """Calculate enhanced luck score using both mean and median"""
-    team_scores = weekly_scores[team_name]
-    team_mean = np.mean(team_scores)
-    team_median = np.median(team_scores)
-    mean_median_gap = team_mean - team_median
+def calculate_enhanced_expected_wins(scores, name):
+    """Calculate expected wins using fractional data to weigh performance quality"""
+    weekly_medians = []
+    adjusted_wins = 0
     
+    # Calculate weekly medians
+    for week in range(len(scores)):
+        week_scores = [team_scores[week] for team_scores in weekly_scores.values()]
+        weekly_medians.append(np.median(week_scores))
+        
+        # Get fractional score for the week
+        fractional_score = weekly_fractional_records[name][week]
+        
+        if scores[week] > weekly_medians[week]:
+            # Above median: weight by how impressive the performance was
+            quality_modifier = (fractional_score / 9)  # Scale of 0 to 1
+            adjusted_wins += 0.7 + (0.3 * quality_modifier)  # Base win (0.7) plus quality bonus
+        else:
+            # Below median: partial credit based on how close they were
+            quality_modifier = (fractional_score / 9)  # Scale of 0 to 1
+            adjusted_wins += 0.3 * quality_modifier  # Partial credit for strong below-median performance
+    
+    return round(adjusted_wins, 1)
+
+def calculate_enhanced_luck_score(team_name):
+    """Calculate luck score incorporating quality wins and tough losses"""
+    scores = weekly_scores[team_name]
+    team_median = np.median(scores)
+    
+    base_score = 50
+    luck_adjustments = []
     below_median_wins = 0
-    median_to_mean_wins = 0
     close_games_won = 0
     close_games_lost = 0
     
-    for week in range(1, 10):
-        opponent = get_opponent_for_week(team_name, week, weekly_matchups)
-        opp_score = weekly_scores[opponent][week-1]
-        team_score = team_scores[week-1]
+    for week in range(9):
+        opponent = get_opponent_for_week(team_name, week + 1, weekly_matchups)
+        team_score = scores[week]
+        opp_score = weekly_scores[opponent][week]
+        fractional_score = weekly_fractional_records[team_name][week]
         
         won_game = team_score > opp_score
         
         if won_game:
             if team_score < team_median:
                 below_median_wins += 1
-            elif team_score < team_mean:
-                median_to_mean_wins += 1
+                
+            # Quality win analysis
+            if fractional_score <= 3:  # Won despite low fractional score
+                luck_adjustments.append(5)  # Lucky win
+            elif fractional_score >= 7:  # Won with high fractional score
+                luck_adjustments.append(-1)  # Expected win
+        else:
+            # Tough loss analysis
+            if fractional_score >= 7:  # Lost despite high fractional score
+                luck_adjustments.append(-5)  # Very unlucky
+            elif fractional_score <= 3:  # Lost with low fractional score
+                luck_adjustments.append(1)  # Expected loss
         
+        # Track close games
         if abs(team_score - opp_score) < 10:
             if won_game:
                 close_games_won += 1
             else:
                 close_games_lost += 1
     
-    expected_wins = calculate_enhanced_expected_wins(team_scores, weekly_scores)
+    # Calculate expected wins
+    expected_wins = calculate_enhanced_expected_wins(scores, team_name)
     wail = actual_wins[team_name] - expected_wins
     
-    base_score = 50
-    luck_score = base_score + (wail * 10)
-    luck_score += (below_median_wins * 7)
-    luck_score += (median_to_mean_wins * 3)
+    # Combine all luck components
+    luck_score = base_score
+    luck_score += sum(luck_adjustments)  # Quality wins/tough losses impact
+    luck_score += (wail * 8)  # WAIL impact
+    luck_score += (below_median_wins * 4)  # Below median wins impact
     
-    total_close = close_games_won + close_games_lost
-    if total_close > 0:
-        close_game_ratio = close_games_won / total_close
-        luck_score += ((close_game_ratio - 0.5) * 20)
-    
-    league_gaps = [np.mean(scores) - np.median(scores) for scores in weekly_scores.values()]
-    avg_gap = np.mean(league_gaps)
-    if abs(mean_median_gap) > abs(avg_gap):
-        luck_score += 5 if mean_median_gap > 0 else -5
+    # Close games impact
+    if (close_games_won + close_games_lost) > 0:
+        close_game_ratio = close_games_won / (close_games_won + close_games_lost)
+        luck_score += ((close_game_ratio - 0.5) * 16)
     
     luck_score = max(0, min(100, luck_score))
     
@@ -248,11 +230,40 @@ def calculate_luck_score(team_name, weekly_scores, actual_wins, weekly_matchups)
                       'Slightly Unlucky' if luck_score < 45 else
                       'Neutral',
         'close_games_record': f"{close_games_won}-{close_games_lost}",
-        'below_median_wins': below_median_wins,
-        'mean_median_gap': round(mean_median_gap, 2)
+        'below_median_wins': below_median_wins
     }
 
-def calculate_future_sos(team_name, weekly_scores, future_matchups):
+def calculate_performance_score(scores, name):
+    """Calculate performance score using fractional data as quality modifier"""
+    mean = np.mean(scores)
+    std_dev = np.std(scores)
+    
+    # Base components
+    max_avg_points = max(np.mean(team_scores) for team_scores in weekly_scores.values())
+    base_points_score = (mean / max_avg_points) * 100
+    win_score = (actual_wins[name] / 9) * 100
+    consistency_score = 100 - ((std_dev / 30) * 100)
+    
+    # Calculate quality of points using fractional data
+    weekly_quality_scores = []
+    for week, score in enumerate(scores):
+        fractional_score = weekly_fractional_records[name][week]
+        quality_modifier = fractional_score / 9  # Scale of 0 to 1
+        weekly_quality_scores.append(quality_modifier)
+    
+    avg_quality = np.mean(weekly_quality_scores)
+    quality_adjusted_points = base_points_score * (0.7 + (0.3 * avg_quality))
+    
+    # Final weighted score
+    perf_score = (
+        (quality_adjusted_points * 0.50) +  # Points scored with quality adjustment
+        (win_score * 0.30) +                # Actual wins
+        (consistency_score * 0.20)          # Consistency
+    )
+    
+    return round(perf_score, 1)
+
+def calculate_future_sos(team_name):
     """Calculate strength of future schedule"""
     future_opponents = []
     for week in range(10, 15):
@@ -270,29 +281,41 @@ def calculate_future_sos(team_name, weekly_scores, future_matchups):
     }
 
 def calculate_metrics(scores, name):
+    """Calculate all metrics for a team"""
     mean = np.mean(scores)
     median = np.median(scores)
     std_dev = np.std(scores)
     
-    trends = calculate_performance_trends(scores)
+    # Calculate trend metrics
+    rolling_avg = []
+    for i in range(len(scores)-2):
+        avg = np.mean(scores[i:i+3])
+        rolling_avg.append(avg)
     
+    recent_trend = np.polyfit(range(4), scores[-4:], 1)[0]
+    
+    if abs(recent_trend) < 2:
+        trend = 'Stable'
+    elif recent_trend > 0:
+        trend = 'Improving'
+    else:
+        trend = 'Declining'
+    
+    stability = 100 - (np.std(rolling_avg) / np.mean(rolling_avg) * 100)
+    
+    # Calculate consistency rating
     consistency_rating = (
         'High' if std_dev <= 20 else
         'Medium' if std_dev <= 25 else
         'Low'
     )
     
-    enhanced_expected_wins = calculate_enhanced_expected_wins(scores, weekly_scores)
+    # Enhanced metrics using fractional data
+    enhanced_expected_wins = calculate_enhanced_expected_wins(scores, name)
     wail = actual_wins[name] - enhanced_expected_wins
-    
-    max_avg_points = max(np.mean(team_scores) for team_scores in weekly_scores.values())
-    points_score = (mean / max_avg_points) * 100
-    win_score = (actual_wins[name] / 9) * 100
-    consistency_score = 100 - ((std_dev / 30) * 100)
-    perf_score = (points_score * 0.45) + (win_score * 0.35) + (consistency_score * 0.20)
-    
-    luck_metrics = calculate_luck_score(name, weekly_scores, actual_wins, weekly_matchups)
-    future_metrics = calculate_future_sos(name, weekly_scores, future_matchups)
+    perf_score = calculate_performance_score(scores, name)
+    luck_metrics = calculate_enhanced_luck_score(name)
+    future_metrics = calculate_future_sos(name)
     
     return {
         'name': name,
@@ -300,14 +323,14 @@ def calculate_metrics(scores, name):
         'avgPF': round(mean, 2),
         'medianPF': round(median, 2),
         'mean_median_gap': round(mean - median, 2),
-        'expectedWins': round(enhanced_expected_wins, 1),
+        'expectedWins': enhanced_expected_wins,
         'actualWins': actual_wins[name],
         'wail': round(wail, 2),
         'weeklyStdDev': round(std_dev, 1),
         'consistency': consistency_rating,
-        'trend': trends['trend'],
-        'trend_stability': trends['stability'],
-        'perfScore': round(perf_score, 1),
+        'trend': trend,
+        'trend_stability': round(stability, 1),
+        'perfScore': perf_score,
         'luck_score': luck_metrics['luck_score'],
         'luck_rating': luck_metrics['luck_rating'],
         'close_games_record': luck_metrics['close_games_record'],
@@ -316,17 +339,16 @@ def calculate_metrics(scores, name):
         'future_schedule': future_metrics['week_by_week']
     }
 
-    # Calculate metrics for all teams
+# Calculate metrics for all teams
 team_metrics = [calculate_metrics(scores, name) for name, scores in weekly_scores.items()]
 team_metrics.sort(key=lambda x: x['perfScore'], reverse=True)
 
-# Create performance trend visualization
 def create_trend_chart(team_metrics):
     fig = go.Figure()
     
     # Calculate weekly league medians
     weekly_medians = []
-    for week in range(9):  # 9 weeks of data
+    for week in range(9):
         week_scores = [weekly_scores[team][week] for team in weekly_scores]
         weekly_medians.append(np.median(week_scores))
     
@@ -368,7 +390,7 @@ def create_trend_chart(team_metrics):
             xanchor="left",
             x=1.02
         ),
-        margin=dict(r=150)  # Add right margin for legend
+        margin=dict(r=150)
     )
     
     return fig
