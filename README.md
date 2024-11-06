@@ -21,7 +21,7 @@ ________
 **Updates**
 - Modified expected wins calculations
 - Added League Median line to weekly trend chart
-
+- Fractional wins used as modifiers for Expected Wins, Luck Score, and Performance Score.
 ________
 
 **PART 1 - CORE STATISTICAL CALCULATIONS**
