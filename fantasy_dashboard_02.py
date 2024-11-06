@@ -421,6 +421,15 @@ def create_trend_chart(team_metrics):
 # Display dashboard
 st.title('Fantasy Football Analytics Dashboard')
 
+# Process total fractional records
+fractional_records = {}
+for team, record in total_fractional_records.items():
+    wins, losses = map(int, record.split('/'))
+    fractional_records[team] = {
+        'total_wins': wins,
+        'total_losses': losses
+    }
+
 # Sort teams by fractional win percentage
 sorted_teams = sorted(
     fractional_records.items(),
@@ -435,13 +444,19 @@ fig_fractional_total.add_trace(go.Bar(
     name='Fractional Wins',
     x=sorted_team_names,
     y=[fractional_records[team]['total_wins'] for team in sorted_team_names],
-    marker_color='#ffc658'
+    marker_color='#ffc658',
+    text=[f"{fractional_records[team]['total_wins']}/81" for team in sorted_team_names],
+    textposition='auto',
+    hoverinfo='text'
 ))
 fig_fractional_total.add_trace(go.Bar(
     name='Fractional Losses',
     x=sorted_team_names,
     y=[fractional_records[team]['total_losses'] for team in sorted_team_names],
-    marker_color='#ff7f7f'
+    marker_color='#ff7f7f',
+    text=[f"{fractional_records[team]['total_losses']}/81" for team in sorted_team_names],
+    textposition='auto',
+    hoverinfo='text'
 ))
 
 fig_fractional_total.update_layout(
@@ -449,7 +464,13 @@ fig_fractional_total.update_layout(
     barmode='stack',
     plot_bgcolor='rgba(0,0,0,0)',
     paper_bgcolor='rgba(0,0,0,0)',
-    font_color='white'
+    font_color='white',
+    yaxis=dict(
+        title='Fractional Wins / Losses',
+        range=[0, 81],
+        tickvals=[0, 20, 40, 60, 81],
+        ticktext=['0', '20', '40', '60', '81']
+    )
 )
 
 st.plotly_chart(fig_fractional_total, use_container_width=True)
@@ -516,6 +537,9 @@ for team in team_metrics:
         'neutral-card'
     )
     
+    # Construct the fractional record string
+    fractional_record = f"{fractional_records[team['name']]['total_wins']}/{fractional_records[team['name']]['total_wins'] + fractional_records[team['name']]['total_losses']}"
+    
     st.markdown(f"""
         <div class="stat-card {luck_class}">
             <div class="card-header">
@@ -523,7 +547,7 @@ for team in team_metrics:
                 <span class="metrics">
                     Perf Score: {team['perfScore']} | 
                     Luck Score: {team['luck_score']} | 
-                    Fractional: {fractional_records[team['name']]['record']}
+                    Fractional: {fractional_record}
                 </span>
             </div>
             <div class="metric-grid">
