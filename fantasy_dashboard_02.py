@@ -538,7 +538,7 @@ for team in team_metrics:
     )
     
     # Construct the fractional record string
-    fractional_record = f"{fractional_records[team['name']]['total_wins']}/{fractional_records[team['name']]['total_wins'] + fractional_records[team['name']]['total_losses']}"
+    fractional_record = f"{fractional_records[team['name']]['total_wins']}/81"
     
     st.markdown(f"""
         <div class="stat-card {luck_class}">
