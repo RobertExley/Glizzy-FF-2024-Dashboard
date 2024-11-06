@@ -22,6 +22,8 @@ ________
 - Modified expected wins calculations
 - Added League Median line to weekly trend chart
 
+________
+
 **PART 1 - CORE STATISTICAL CALCULATIONS**
 
 1. Basic Statistics:
