@@ -324,6 +324,13 @@ team_metrics.sort(key=lambda x: x['perfScore'], reverse=True)
 def create_trend_chart(team_metrics):
     fig = go.Figure()
     
+    # Calculate weekly league medians
+    weekly_medians = []
+    for week in range(9):  # 9 weeks of data
+        week_scores = [weekly_scores[team][week] for team in weekly_scores]
+        weekly_medians.append(np.median(week_scores))
+    
+    # Add team lines
     for team in team_metrics:
         scores = weekly_scores[team['name']]
         fig.add_trace(go.Scatter(
@@ -333,13 +340,35 @@ def create_trend_chart(team_metrics):
             mode='lines+markers'
         ))
     
+    # Add league median line
+    fig.add_trace(go.Scatter(
+        x=list(range(1, 10)),
+        y=weekly_medians,
+        name='League Median',
+        mode='lines',
+        line=dict(
+            color='rgba(255, 255, 255, 0.5)',
+            width=2,
+            dash='dash'
+        ),
+        hovertemplate='Week %{x}<br>League Median: %{y:.1f}<extra></extra>'
+    ))
+    
     fig.update_layout(
         title='Scoring Trends by Week',
         xaxis_title='Week',
         yaxis_title='Points',
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        font_color='white'
+        font_color='white',
+        showlegend=True,
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=1.02
+        ),
+        margin=dict(r=150)  # Add right margin for legend
     )
     
     return fig
