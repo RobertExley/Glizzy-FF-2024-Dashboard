@@ -421,6 +421,31 @@ def create_trend_chart(team_metrics):
 # Display dashboard
 st.title('Fantasy Football Analytics Dashboard')
 
+# Performance vs Expected Wins Chart
+fig_wins = go.Figure()
+fig_wins.add_trace(go.Bar(
+    name='Expected Wins',
+    x=[team['name'] for team in team_metrics],
+    y=[team['expectedWins'] for team in team_metrics],
+    marker_color='#8884d8'
+))
+fig_wins.add_trace(go.Bar(
+    name='Actual Wins',
+    x=[team['name'] for team in team_metrics],
+    y=[team['actualWins'] for team in team_metrics],
+    marker_color='#82ca9d'
+))
+
+fig_wins.update_layout(
+    title='Performance vs. Expected Wins',
+    barmode='group',
+    plot_bgcolor='rgba(0,0,0,0)',
+    paper_bgcolor='rgba(0,0,0,0)',
+    font_color='white'
+)
+
+st.plotly_chart(fig_wins, use_container_width=True)
+
 # Process total fractional records
 fractional_records = {}
 for team, record in total_fractional_records.items():
@@ -474,31 +499,6 @@ fig_fractional_total.update_layout(
 )
 
 st.plotly_chart(fig_fractional_total, use_container_width=True)
-
-# Performance vs Expected Wins Chart
-fig_wins = go.Figure()
-fig_wins.add_trace(go.Bar(
-    name='Expected Wins',
-    x=[team['name'] for team in team_metrics],
-    y=[team['expectedWins'] for team in team_metrics],
-    marker_color='#8884d8'
-))
-fig_wins.add_trace(go.Bar(
-    name='Actual Wins',
-    x=[team['name'] for team in team_metrics],
-    y=[team['actualWins'] for team in team_metrics],
-    marker_color='#82ca9d'
-))
-
-fig_wins.update_layout(
-    title='Performance vs. Expected Wins',
-    barmode='group',
-    plot_bgcolor='rgba(0,0,0,0)',
-    paper_bgcolor='rgba(0,0,0,0)',
-    font_color='white'
-)
-
-st.plotly_chart(fig_wins, use_container_width=True)
 
 # Scoring Trends Chart
 st.plotly_chart(create_trend_chart(team_metrics), use_container_width=True)
