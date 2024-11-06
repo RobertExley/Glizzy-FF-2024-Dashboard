@@ -460,7 +460,7 @@ fig_fractional_total.add_trace(go.Bar(
 ))
 
 fig_fractional_total.update_layout(
-    title='Total Fractional Record Distribution',
+    title='Total Fractional Records',
     barmode='stack',
     plot_bgcolor='rgba(0,0,0,0)',
     paper_bgcolor='rgba(0,0,0,0)',
