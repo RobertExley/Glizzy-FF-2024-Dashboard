@@ -2,7 +2,7 @@
 
 To host the dashboard locally, input the following into Powershell. 
 1. Navigate to the correct file directory first (in my case): cd C:\Users\hoon\Desktop
-2. python -m streamlit run fantasy_dashboard.py
+2. python -m streamlit run fantasy_dashboard_02.py
 
 It should lead to this message:
       "Welcome to Streamlit!
@@ -16,7 +16,7 @@ Skip the email signup:
 
 ________
 
-**Current iteration as of 12:00 PM, 11/05/2024**
+**Current iteration as of 6:31am, 11/06/24**
 
 **PART 1 - CORE STATISTICAL CALCULATIONS**
 
@@ -66,12 +66,45 @@ Stability Score:
 - Higher score = more stable performance
 - Formula: 100 - (StdDev of rolling avg / Mean * 100)
 
-**PART 2 - PERFORMANCE METRICS**
+**PART 2 - PERFORMANCE METRICS (UPDATED)**
 
-Expected Wins:
-- Count of weeks scoring above league median
-- Purpose: Shows deserved wins based on scoring
-- Formula: Sum of (Score > Weekly League Median)
+Base Expected Wins:
+- Still start by counting weeks above median
+- Example: 6 base expected wins
+
+Mean-Median Gap Adjustment:
+- Looks at the pattern of your scoring
+- If you have big explosive weeks (positive gap):
+      - Example: Scores like [100, 100, 100, 180]
+      - Mean = 120, Median = 100, Gap = +20
+      - System thinks "These explosive weeks might not continue"
+      - Slightly reduces your expected wins
+-If you have occasional bad weeks (negative gap):
+      - Example: Scores like [120, 120, 120, 80]
+      - Mean = 110, Median = 120, Gap = -10
+      - System thinks "You're better than your bad weeks show"
+      - Slightly increases your expected wins
+
+Consistency Bonus/Penalty:
+- Rewards teams that score reliably
+- Penalizes teams that are unpredictable
+- Example:
+      - Team A: [100, 102, 98, 101] = Very consistent = Small bonus
+      - Team B: [140, 80, 130, 70] = Very volatile = Small penalty
+
+Final Number:
+- Combines all these factors
+- Results in decimal places to show detail
+- Example: 5.2 Expected Wins means:
+      - Base: Maybe 6 weeks above median
+      - But: Some wins came from explosive weeks
+      - And: Showing some inconsistency
+      - So: System expects slight regression
+
+Why This Matters:
+- More accurate prediction of "deserved" wins
+- Helps identify teams likely to improve or decline
+- Better at spotting lucky/unlucky teams
 
 WAIL (Wins Above Index Level):
 - Actual Wins minus Expected Wins
@@ -91,6 +124,9 @@ Close Games:
 - Format: Wins-Losses in close games
 - Purpose: Shows performance in tight matchups
 - Helps identify luck vs skill in critical games
+
+Mean-Median Gap Adjustments:
+
 
 Performance Score (0-100):
 - Composite rating using:
