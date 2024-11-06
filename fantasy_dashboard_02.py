@@ -115,6 +115,20 @@ actual_wins = {
     'Neil': 4, 'Archer': 2
 }
 
+# Total fractional records
+total_fractional_records = {
+    'Veen': '37/81',
+    'Azhar': '46/81',
+    'hoon': '56/81',
+    'Sangmin': '41/81',
+    'Neil': '26/81',
+    'Gautam': '57/81',
+    'Abdullah': '47/81',
+    'Liam': '36/81',
+    'Yeef': '37/81',
+    'Archer': '23/81'
+}
+
 # Weekly fractional records
 weekly_fractional_records = {
     'Veen': [9, 0, 1, 8, 4, 5, 0, 1, 9],
@@ -128,6 +142,18 @@ weekly_fractional_records = {
     'Yeef': [1, 7, 4, 1, 8, 8, 2, 6, 0],
     'Archer': [0, 3, 0, 0, 3, 3, 5, 7, 2]
 }
+
+# Calculate fractional records
+fractional_records = {}
+for team in total_fractional_records:
+    wins, losses = map(int, total_fractional_records[team].split('/'))
+    win_pct = wins / (wins + losses)
+    fractional_records[team] = {
+        'record': f"{wins}-{losses}",
+        'win_pct': round(win_pct, 3),
+        'total_wins': wins,
+        'total_losses': losses
+    }
 
 def get_opponent_for_week(team, week, matchups_dict):
     """Get a team's opponent for a specific week"""
@@ -279,7 +305,6 @@ def calculate_future_sos(team_name):
         'week_by_week': [(week, opp, round(np.mean(weekly_scores[opp]), 2)) 
                         for week, opp in zip(range(10, 15), future_opponents)]
     }
-
 def calculate_metrics(scores, name):
     """Calculate all metrics for a team"""
     mean = np.mean(scores)
@@ -303,14 +328,12 @@ def calculate_metrics(scores, name):
     
     stability = 100 - (np.std(rolling_avg) / np.mean(rolling_avg) * 100)
     
-    # Calculate consistency rating
     consistency_rating = (
         'High' if std_dev <= 20 else
         'Medium' if std_dev <= 25 else
         'Low'
     )
     
-    # Enhanced metrics using fractional data
     enhanced_expected_wins = calculate_enhanced_expected_wins(scores, name)
     wail = actual_wins[name] - enhanced_expected_wins
     perf_score = calculate_performance_score(scores, name)
@@ -398,6 +421,39 @@ def create_trend_chart(team_metrics):
 # Display dashboard
 st.title('Fantasy Football Analytics Dashboard')
 
+# Sort teams by fractional win percentage
+sorted_teams = sorted(
+    fractional_records.items(),
+    key=lambda x: x[1]['total_wins'] / (x[1]['total_wins'] + x[1]['total_losses']),
+    reverse=True
+)
+sorted_team_names = [team[0] for team in sorted_teams]
+
+# Total Fractional Records Chart
+fig_fractional_total = go.Figure()
+fig_fractional_total.add_trace(go.Bar(
+    name='Fractional Wins',
+    x=sorted_team_names,
+    y=[fractional_records[team]['total_wins'] for team in sorted_team_names],
+    marker_color='#ffc658'
+))
+fig_fractional_total.add_trace(go.Bar(
+    name='Fractional Losses',
+    x=sorted_team_names,
+    y=[fractional_records[team]['total_losses'] for team in sorted_team_names],
+    marker_color='#ff7f7f'
+))
+
+fig_fractional_total.update_layout(
+    title='Total Fractional Record Distribution',
+    barmode='stack',
+    plot_bgcolor='rgba(0,0,0,0)',
+    paper_bgcolor='rgba(0,0,0,0)',
+    font_color='white'
+)
+
+st.plotly_chart(fig_fractional_total, use_container_width=True)
+
 # Performance vs Expected Wins Chart
 fig_wins = go.Figure()
 fig_wins.add_trace(go.Bar(
@@ -464,7 +520,11 @@ for team in team_metrics:
         <div class="stat-card {luck_class}">
             <div class="card-header">
                 <span class="team-name">{team['name']} ({team['record']})</span>
-                <span class="metrics">Perf Score: {team['perfScore']} | Luck Score: {team['luck_score']}</span>
+                <span class="metrics">
+                    Perf Score: {team['perfScore']} | 
+                    Luck Score: {team['luck_score']} | 
+                    Fractional: {fractional_records[team['name']]['record']}
+                </span>
             </div>
             <div class="metric-grid">
                 <div>
