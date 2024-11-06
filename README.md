@@ -22,6 +22,7 @@ ________
 - Modified expected wins calculations
 - Added League Median line to weekly trend chart
 - Fractional wins used as modifiers for Expected Wins, Luck Score, and Performance Score.
+- Fractional wins visualizer
 ________
 **Model info (WIP. Will complete once the model finds itself in a more optimal place before Week 10)**
 
