@@ -18,6 +18,10 @@ ________
 
 **Current iteration as of 6:31am, 11/06/24**
 
+**Updates**
+- Modified expected wins calculations
+- Added League Median line to weekly trend chart
+
 **PART 1 - CORE STATISTICAL CALCULATIONS**
 
 1. Basic Statistics:
