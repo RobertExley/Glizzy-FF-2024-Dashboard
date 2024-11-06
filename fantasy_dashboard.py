@@ -115,18 +115,54 @@ actual_wins = {
     'Neil': 4, 'Archer': 2
 }
 
+def calculate_enhanced_expected_wins(scores, all_weekly_scores):
+    """Calculate expected wins with sophisticated mean-median gap analysis"""
+    team_mean = np.mean(scores)
+    team_median = np.median(scores)
+    mean_median_gap = team_mean - team_median
+    
+    # Calculate weekly medians and league averages
+    weekly_medians = []
+    for week in range(len(scores)):
+        week_scores = [team_scores[week] for team_scores in all_weekly_scores.values()]
+        weekly_medians.append(np.median(week_scores))
+    
+    # Base expected wins calculation
+    base_expected_wins = sum(1 for i, score in enumerate(scores) if score > weekly_medians[i])
+    
+    # Calculate mean-median gap percentile
+    league_gaps = [np.mean(team_scores) - np.median(team_scores) 
+                  for team_scores in all_weekly_scores.values()]
+    gap_percentile = sum(1 for gap in league_gaps 
+                        if abs(gap) < abs(mean_median_gap)) / len(league_gaps)
+    
+    # Calculate adjustments based on gap analysis
+    if mean_median_gap > 0:  # Right-skewed distribution (occasional high scores)
+        gap_adjustment = -0.15 * gap_percentile * base_expected_wins
+    else:  # Left-skewed distribution (occasional low scores)
+        gap_adjustment = 0.15 * gap_percentile * base_expected_wins
+    
+    # Consistency adjustment
+    weekly_cv = np.std(scores) / np.mean(scores)
+    league_cvs = [np.std(team_scores) / np.mean(team_scores) 
+                 for team_scores in all_weekly_scores.values()]
+    avg_cv = np.mean(league_cvs)
+    consistency_adjustment = 0.1 * (avg_cv - weekly_cv) * base_expected_wins
+    
+    # Calculate final expected wins
+    enhanced_expected_wins = base_expected_wins + gap_adjustment + consistency_adjustment
+    
+    return max(0, min(len(scores), enhanced_expected_wins))
+
 def calculate_performance_trends(scores):
     """Calculate performance trends and stability"""
-    # Calculate 3-week rolling average
     rolling_avg = []
     for i in range(len(scores)-2):
         avg = np.mean(scores[i:i+3])
         rolling_avg.append(avg)
     
-    # Calculate recent trend (last 4 weeks)
     recent_trend = np.polyfit(range(4), scores[-4:], 1)[0]
     
-    # Determine trend direction and strength
     if abs(recent_trend) < 2:
         trend = 'Stable'
     elif recent_trend > 0:
@@ -134,7 +170,6 @@ def calculate_performance_trends(scores):
     else:
         trend = 'Declining'
     
-    # Calculate stability score (0-100, higher = more stable)
     stability = 100 - (np.std(rolling_avg) / np.mean(rolling_avg) * 100)
     
     return {
@@ -159,19 +194,16 @@ def calculate_luck_score(team_name, weekly_scores, actual_wins, weekly_matchups)
     team_median = np.median(team_scores)
     mean_median_gap = team_mean - team_median
     
-    # Track different types of wins
     below_median_wins = 0
     median_to_mean_wins = 0
     close_games_won = 0
     close_games_lost = 0
     
-    # Analyze each matchup
     for week in range(1, 10):
         opponent = get_opponent_for_week(team_name, week, weekly_matchups)
         opp_score = weekly_scores[opponent][week-1]
         team_score = team_scores[week-1]
         
-        # Determine win/loss
         won_game = team_score > opp_score
         
         if won_game:
@@ -180,48 +212,30 @@ def calculate_luck_score(team_name, weekly_scores, actual_wins, weekly_matchups)
             elif team_score < team_mean:
                 median_to_mean_wins += 1
         
-        # Track close games (margin < 10)
         if abs(team_score - opp_score) < 10:
             if won_game:
                 close_games_won += 1
             else:
                 close_games_lost += 1
     
-    # Calculate expected wins
-    weekly_medians = []
-    for week in range(9):
-        week_scores = [scores[week] for scores in weekly_scores.values()]
-        weekly_medians.append(np.median(week_scores))
-    expected_wins = sum(1 for i, score in enumerate(team_scores) if score > weekly_medians[i])
-    
-    # Calculate WAIL
+    expected_wins = calculate_enhanced_expected_wins(team_scores, weekly_scores)
     wail = actual_wins[team_name] - expected_wins
     
-    # Calculate composite luck score
     base_score = 50
-    
-    # WAIL impact (±10 per win differential)
     luck_score = base_score + (wail * 10)
-    
-    # Below median wins impact (±7 per occurrence)
     luck_score += (below_median_wins * 7)
-    
-    # Median to mean wins impact (±3 per occurrence)
     luck_score += (median_to_mean_wins * 3)
     
-    # Close game impact (based on record)
     total_close = close_games_won + close_games_lost
     if total_close > 0:
         close_game_ratio = close_games_won / total_close
-        luck_score += ((close_game_ratio - 0.5) * 20)  # Max ±10 points
+        luck_score += ((close_game_ratio - 0.5) * 20)
     
-    # Mean-median gap impact
     league_gaps = [np.mean(scores) - np.median(scores) for scores in weekly_scores.values()]
     avg_gap = np.mean(league_gaps)
     if abs(mean_median_gap) > abs(avg_gap):
         luck_score += 5 if mean_median_gap > 0 else -5
     
-    # Normalize to 0-100 range
     luck_score = max(0, min(100, luck_score))
     
     return {
@@ -260,7 +274,6 @@ def calculate_metrics(scores, name):
     median = np.median(scores)
     std_dev = np.std(scores)
     
-    # Calculate trend metrics
     trends = calculate_performance_trends(scores)
     
     consistency_rating = (
@@ -269,13 +282,8 @@ def calculate_metrics(scores, name):
         'Low'
     )
     
-    weekly_medians = []
-    for week in range(9):
-        week_scores = [team_scores[week] for team_scores in weekly_scores.values()]
-        weekly_medians.append(np.median(week_scores))
-    
-    expected_wins = sum(1 for i, score in enumerate(scores) if score > weekly_medians[i])
-    wail = actual_wins[name] - expected_wins
+    enhanced_expected_wins = calculate_enhanced_expected_wins(scores, weekly_scores)
+    wail = actual_wins[name] - enhanced_expected_wins
     
     max_avg_points = max(np.mean(team_scores) for team_scores in weekly_scores.values())
     points_score = (mean / max_avg_points) * 100
@@ -292,7 +300,7 @@ def calculate_metrics(scores, name):
         'avgPF': round(mean, 2),
         'medianPF': round(median, 2),
         'mean_median_gap': round(mean - median, 2),
-        'expectedWins': round(expected_wins, 1),
+        'expectedWins': round(enhanced_expected_wins, 1),
         'actualWins': actual_wins[name],
         'wail': round(wail, 2),
         'weeklyStdDev': round(std_dev, 1),
@@ -308,7 +316,7 @@ def calculate_metrics(scores, name):
         'future_schedule': future_metrics['week_by_week']
     }
 
-# Calculate metrics for all teams
+    # Calculate metrics for all teams
 team_metrics = [calculate_metrics(scores, name) for name, scores in weekly_scores.items()]
 team_metrics.sort(key=lambda x: x['perfScore'], reverse=True)
 
