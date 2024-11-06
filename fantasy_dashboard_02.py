@@ -452,9 +452,9 @@ fig_fractional_total.add_trace(go.Bar(
 fig_fractional_total.add_trace(go.Bar(
     name='Fractional Losses',
     x=sorted_team_names,
-    y=[fractional_records[team]['total_losses'] for team in sorted_team_names],
+    y=[81 - fractional_records[team]['total_wins'] for team in sorted_team_names],
     marker_color='#ff7f7f',
-    text=[f"{fractional_records[team]['total_losses']}/81" for team in sorted_team_names],
+    text=[f"{81 - fractional_records[team]['total_wins']}/81" for team in sorted_team_names],
     textposition='auto',
     hoverinfo='text'
 ))
