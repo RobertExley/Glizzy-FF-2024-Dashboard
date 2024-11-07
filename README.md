@@ -2,7 +2,8 @@
 
 To host the dashboard locally, input the following into Powershell. 
 1. Navigate to the correct file directory first (in my case): cd C:\Users\hoon\Desktop
-2. python -m streamlit run fantasy_dashboard_02.py
+2. pip install -r requirements.txt
+3. python -m streamlit run fantasy_dashboard_02.py
 
 It should lead to this message:
       "Welcome to Streamlit!
