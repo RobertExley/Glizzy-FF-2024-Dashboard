@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
+from data_collector.data_collector import SleeperDataCollector
 
 # Page config
 st.set_page_config(layout="wide", page_title="Fantasy Football Analytics")
@@ -72,81 +73,56 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Raw weekly scores
-weekly_scores = {
-    'Gautam': [110.86, 200.12, 126.26, 123.64, 163.68, 127.42, 120.96, 174.5, 165.1],
-    'hoon': [160.36, 132.82, 179.06, 113.28, 147.38, 165.62, 141.74, 146.86, 163.74],
-    'Azhar': [163.48, 110.76, 136.64, 119.3, 142.64, 140.1, 154.42, 137.14, 140.48],
-    'Abdullah': [108.68, 176.14, 137.18, 147.68, 143.62, 142.56, 119.34, 140.96, 131.96],
-    'Sangmin': [127.72, 124.08, 152.08, 123.92, 129.32, 117.62, 167.54, 103.76, 146],
-    'Veen': [170.26, 99.2, 99.9, 156.1, 135.84, 131.28, 75.74, 135.6, 168.4],
-    'Liam': [107.52, 139.72, 104.34, 174.22, 99.7, 97.46, 150.56, 170.44, 121],
-    'Yeef': [90.04, 141.44, 126.08, 98.8, 156.16, 144.32, 118.8, 151.64, 113.5],
-    'Neil': [126.6, 103.4, 115.38, 114.84, 135.34, 118.5, 109.46, 148.78, 135.44],
-    'Archer': [81.24, 114.16, 90.92, 97.92, 135.66, 125, 140.1, 158.6, 121.5]
-}
+sleeperData = SleeperDataCollector()
 
-# Weekly matchups data
-weekly_matchups = {
-    1: [('hoon', 'Archer'), ('Abdullah', 'Gautam'), ('Yeef', 'Liam'), ('Veen', 'Neil'), ('Azhar', 'Sangmin')],
-    2: [('hoon', 'Abdullah'), ('Archer', 'Gautam'), ('Yeef', 'Neil'), ('Azhar', 'Liam'), ('Veen', 'Sangmin')],
-    3: [('hoon', 'Gautam'), ('Archer', 'Abdullah'), ('Veen', 'Yeef'), ('Liam', 'Sangmin'), ('Azhar', 'Neil')],
-    4: [('hoon', 'Sangmin'), ('Yeef', 'Gautam'), ('Abdullah', 'Liam'), ('Archer', 'Neil'), ('Veen', 'Azhar')],
-    5: [('hoon', 'Azhar'), ('Gautam', 'Liam'), ('Abdullah', 'Yeef'), ('Veen', 'Archer'), ('Neil', 'Sangmin')],
-    6: [('hoon', 'Liam'), ('Neil', 'Gautam'), ('Veen', 'Abdullah'), ('Archer', 'Azhar'), ('Yeef', 'Sangmin')],
-    7: [('hoon', 'Yeef'), ('Veen', 'Gautam'), ('Abdullah', 'Azhar'), ('Archer', 'Sangmin'), ('Neil', 'Liam')],
-    8: [('hoon', 'Neil'), ('Azhar', 'Gautam'), ('Abdullah', 'Sangmin'), ('Archer', 'Yeef'), ('Veen', 'Liam')],
-    9: [('hoon', 'Veen'), ('Gautam', 'Sangmin'), ('Abdullah', 'Neil'), ('Archer', 'Liam'), ('Yeef', 'Azhar')]
-}
+# Weekly matchups data and raw scores
+ALL_WEEKLY_MATCHUPS, WEEKLY_SCORES = sleeperData.get_all_weekly_matchups_and_scores()
 
-# Future matchups
-future_matchups = {
-    10: [('hoon', 'Archer'), ('Abdullah', 'Gautam'), ('Yeef', 'Liam'), ('Veen', 'Neil'), ('Azhar', 'Sangmin')],
-    11: [('hoon', 'Abdullah'), ('Archer', 'Gautam'), ('Yeef', 'Neil'), ('Azhar', 'Liam'), ('Veen', 'Sangmin')],
-    12: [('hoon', 'Gautam'), ('Archer', 'Abdullah'), ('Veen', 'Yeef'), ('Liam', 'Sangmin'), ('Azhar', 'Neil')],
-    13: [('hoon', 'Sangmin'), ('Yeef', 'Gautam'), ('Abdullah', 'Liam'), ('Archer', 'Neil'), ('Veen', 'Azhar')],
-    14: [('hoon', 'Azhar'), ('Gautam', 'Liam'), ('Abdullah', 'Yeef'), ('Veen', 'Archer'), ('Neil', 'Sangmin')]
-}
+CURRENT_WEEK = sleeperData.get_current_week()
+COMPLETED_WEEKS = CURRENT_WEEK - 1
+
+PAST_WEEKLY_MATCHUPS = { k:v for k, v in ALL_WEEKLY_MATCHUPS.items() if k < CURRENT_WEEK }
+FUTURE_MATCHUPS = { k:v for k,v in ALL_WEEKLY_MATCHUPS.items() if k >= CURRENT_WEEK }
 
 # Actual wins
-actual_wins = {
-    'Gautam': 8, 'hoon': 5, 'Azhar': 5, 'Abdullah': 4,
-    'Sangmin': 4, 'Veen': 4, 'Liam': 5, 'Yeef': 4,
-    'Neil': 4, 'Archer': 2
+ACTUAL_WINS = {
+    'gautamm': 8, 'hooghost': 5, 'WinnableEarth71': 5, 'mabdullahnk': 4,
+    'sangdawg': 4, 'vee11': 4, 'duckwirf': 5, 'Yeef': 4,
+    'KikiQuandarius': 4, 'archhers': 2
 }
 
 # Total fractional records
-total_fractional_records = {
-    'Veen': '37/81',
-    'Azhar': '46/81',
-    'hoon': '56/81',
-    'Sangmin': '41/81',
-    'Neil': '26/81',
-    'Gautam': '57/81',
-    'Abdullah': '47/81',
-    'Liam': '36/81',
+TOTAL_FRACTIONAL_RECORDS = {
+    'vee11': '37/81',
+    'WinnableEarth71': '46/81',
+    'hooghost': '56/81',
+    'sangdawg': '41/81',
+    'KikiQuandarius': '26/81',
+    'gautamm': '57/81',
+    'mabdullahnk': '47/81',
+    'duckwirf': '36/81',
     'Yeef': '37/81',
-    'Archer': '23/81'
+    'archhers': '23/81'
 }
 
 # Weekly fractional records
-weekly_fractional_records = {
-    'Veen': [9, 0, 1, 8, 4, 5, 0, 1, 9],
-    'Azhar': [8, 2, 6, 4, 5, 6, 8, 2, 5],
-    'hoon': [7, 5, 9, 2, 7, 9, 6, 4, 7],
-    'Sangmin': [6, 4, 8, 6, 1, 1, 9, 0, 6],
-    'Neil': [5, 1, 3, 3, 2, 2, 1, 5, 4],
-    'Gautam': [4, 9, 5, 5, 5, 4, 4, 8, 8],
-    'Abdullah': [3, 8, 7, 7, 6, 7, 3, 3, 3],
-    'Liam': [2, 6, 2, 9, 0, 0, 7, 8, 2],
+WEEKLY_FRACTIONAL_RECORDS = {
+    'vee11': [9, 0, 1, 8, 4, 5, 0, 1, 9],
+    'WinnableEarth71': [8, 2, 6, 4, 5, 6, 8, 2, 5],
+    'hooghost': [7, 5, 9, 2, 7, 9, 6, 4, 7],
+    'sangdawg': [6, 4, 8, 6, 1, 1, 9, 0, 6],
+    'KikiQuandarius': [5, 1, 3, 3, 2, 2, 1, 5, 4],
+    'gautamm': [4, 9, 5, 5, 5, 4, 4, 8, 8],
+    'mabdullahnk': [3, 8, 7, 7, 6, 7, 3, 3, 3],
+    'duckwirf': [2, 6, 2, 9, 0, 0, 7, 8, 2],
     'Yeef': [1, 7, 4, 1, 8, 8, 2, 6, 0],
-    'Archer': [0, 3, 0, 0, 3, 3, 5, 7, 2]
+    'archhers': [0, 3, 0, 0, 3, 3, 5, 7, 2]
 }
 
 # Calculate fractional records
 fractional_records = {}
-for team in total_fractional_records:
-    wins, losses = map(int, total_fractional_records[team].split('/'))
+for team in TOTAL_FRACTIONAL_RECORDS:
+    wins, losses = map(int, TOTAL_FRACTIONAL_RECORDS[team].split('/'))
     win_pct = wins / (wins + losses)
     fractional_records[team] = {
         'record': f"{wins}-{losses}",
@@ -170,26 +146,26 @@ def calculate_enhanced_expected_wins(scores, name):
     
     # Calculate weekly medians
     for week in range(len(scores)):
-        week_scores = [team_scores[week] for team_scores in weekly_scores.values()]
+        week_scores = [team_scores[week] for team_scores in WEEKLY_SCORES.values()]
         weekly_medians.append(np.median(week_scores))
         
         # Get fractional score for the week
-        fractional_score = weekly_fractional_records[name][week]
+        fractional_score = WEEKLY_FRACTIONAL_RECORDS[name][week]
         
         if scores[week] > weekly_medians[week]:
             # Above median: weight by how impressive the performance was
-            quality_modifier = (fractional_score / 9)  # Scale of 0 to 1
+            quality_modifier = (fractional_score / COMPLETED_WEEKS)  # Scale of 0 to 1
             adjusted_wins += 0.7 + (0.3 * quality_modifier)  # Base win (0.7) plus quality bonus
         else:
             # Below median: partial credit based on how close they were
-            quality_modifier = (fractional_score / 9)  # Scale of 0 to 1
+            quality_modifier = (fractional_score / COMPLETED_WEEKS)  # Scale of 0 to 1
             adjusted_wins += 0.3 * quality_modifier  # Partial credit for strong below-median performance
     
     return round(adjusted_wins, 1)
 
 def calculate_enhanced_luck_score(team_name):
     """Calculate luck score incorporating quality wins and tough losses"""
-    scores = weekly_scores[team_name]
+    scores = WEEKLY_SCORES[team_name]
     team_median = np.median(scores)
     
     base_score = 50
@@ -198,11 +174,11 @@ def calculate_enhanced_luck_score(team_name):
     close_games_won = 0
     close_games_lost = 0
     
-    for week in range(9):
-        opponent = get_opponent_for_week(team_name, week + 1, weekly_matchups)
+    for week in range(COMPLETED_WEEKS):
+        opponent = get_opponent_for_week(team_name, week + 1, PAST_WEEKLY_MATCHUPS)
         team_score = scores[week]
-        opp_score = weekly_scores[opponent][week]
-        fractional_score = weekly_fractional_records[team_name][week]
+        opp_score = WEEKLY_SCORES[opponent][week]
+        fractional_score = WEEKLY_FRACTIONAL_RECORDS[team_name][week]
         
         won_game = team_score > opp_score
         
@@ -231,7 +207,7 @@ def calculate_enhanced_luck_score(team_name):
     
     # Calculate expected wins
     expected_wins = calculate_enhanced_expected_wins(scores, team_name)
-    wail = actual_wins[team_name] - expected_wins
+    wail = ACTUAL_WINS[team_name] - expected_wins
     
     # Combine all luck components
     luck_score = base_score
@@ -265,16 +241,16 @@ def calculate_performance_score(scores, name):
     std_dev = np.std(scores)
     
     # Base components
-    max_avg_points = max(np.mean(team_scores) for team_scores in weekly_scores.values())
+    max_avg_points = max(np.mean(team_scores) for team_scores in WEEKLY_SCORES.values())
     base_points_score = (mean / max_avg_points) * 100
-    win_score = (actual_wins[name] / 9) * 100
+    win_score = (ACTUAL_WINS[name] / COMPLETED_WEEKS) * 100
     consistency_score = 100 - ((std_dev / 30) * 100)
     
     # Calculate quality of points using fractional data
     weekly_quality_scores = []
     for week, score in enumerate(scores):
-        fractional_score = weekly_fractional_records[name][week]
-        quality_modifier = fractional_score / 9  # Scale of 0 to 1
+        fractional_score = WEEKLY_FRACTIONAL_RECORDS[name][week]
+        quality_modifier = fractional_score / COMPLETED_WEEKS  # Scale of 0 to 1
         weekly_quality_scores.append(quality_modifier)
     
     avg_quality = np.mean(weekly_quality_scores)
@@ -293,16 +269,16 @@ def calculate_future_sos(team_name):
     """Calculate strength of future schedule"""
     future_opponents = []
     for week in range(10, 15):
-        opponent = get_opponent_for_week(team_name, week, future_matchups)
+        opponent = get_opponent_for_week(team_name, week, FUTURE_MATCHUPS)
         future_opponents.append(opponent)
     
-    opponent_avgs = [np.mean(weekly_scores[opp]) for opp in future_opponents]
-    league_avg = np.mean([np.mean(scores) for scores in weekly_scores.values()])
+    opponent_avgs = [np.mean(WEEKLY_SCORES[opp]) for opp in future_opponents]
+    league_avg = np.mean([np.mean(scores) for scores in WEEKLY_SCORES.values()])
     
     return {
         'future_sos': round(np.mean(opponent_avgs), 2),
         'vs_league_avg': round(np.mean(opponent_avgs) - league_avg, 2),
-        'week_by_week': [(week, opp, round(np.mean(weekly_scores[opp]), 2)) 
+        'week_by_week': [(week, opp, round(np.mean(WEEKLY_SCORES[opp]), 2)) 
                         for week, opp in zip(range(10, 15), future_opponents)]
     }
 def calculate_metrics(scores, name):
@@ -335,19 +311,19 @@ def calculate_metrics(scores, name):
     )
     
     enhanced_expected_wins = calculate_enhanced_expected_wins(scores, name)
-    wail = actual_wins[name] - enhanced_expected_wins
+    wail = ACTUAL_WINS[name] - enhanced_expected_wins
     perf_score = calculate_performance_score(scores, name)
     luck_metrics = calculate_enhanced_luck_score(name)
     future_metrics = calculate_future_sos(name)
     
     return {
         'name': name,
-        'record': f"{actual_wins[name]}-{9-actual_wins[name]}",
+        'record': f"{ACTUAL_WINS[name]}-{COMPLETED_WEEKS-ACTUAL_WINS[name]}",
         'avgPF': round(mean, 2),
         'medianPF': round(median, 2),
         'mean_median_gap': round(mean - median, 2),
         'expectedWins': enhanced_expected_wins,
-        'actualWins': actual_wins[name],
+        'actualWins': ACTUAL_WINS[name],
         'wail': round(wail, 2),
         'weeklyStdDev': round(std_dev, 1),
         'consistency': consistency_rating,
@@ -363,7 +339,7 @@ def calculate_metrics(scores, name):
     }
 
 # Calculate metrics for all teams
-team_metrics = [calculate_metrics(scores, name) for name, scores in weekly_scores.items()]
+team_metrics = [calculate_metrics(scores, name) for name, scores in WEEKLY_SCORES.items()]
 team_metrics.sort(key=lambda x: x['perfScore'], reverse=True)
 
 def create_trend_chart(team_metrics):
@@ -371,13 +347,13 @@ def create_trend_chart(team_metrics):
     
     # Calculate weekly league medians
     weekly_medians = []
-    for week in range(9):
-        week_scores = [weekly_scores[team][week] for team in weekly_scores]
+    for week in range(COMPLETED_WEEKS):
+        week_scores = [WEEKLY_SCORES[team][week] for team in WEEKLY_SCORES]
         weekly_medians.append(np.median(week_scores))
     
     # Add team lines
     for team in team_metrics:
-        scores = weekly_scores[team['name']]
+        scores = WEEKLY_SCORES[team['name']]
         fig.add_trace(go.Scatter(
             x=list(range(1, 10)),
             y=scores,
@@ -448,7 +424,7 @@ st.plotly_chart(fig_wins, use_container_width=True)
 
 # Process total fractional records
 fractional_records = {}
-for team, record in total_fractional_records.items():
+for team, record in TOTAL_FRACTIONAL_RECORDS.items():
     wins, losses = map(int, record.split('/'))
     fractional_records[team] = {
         'total_wins': wins,
