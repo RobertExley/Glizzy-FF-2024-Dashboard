@@ -108,6 +108,11 @@ class SleeperDataCollector:
 
         return weekly_matchups, weekly_scores
     
+    def split_weekly_matchups(self, all_weekly_matchups, week):
+        past_weekly_matchups = { k:v for k, v in all_weekly_matchups.items() if k < week }
+        future_weekly_matchups = { k:v for k, v in all_weekly_matchups.items() if k >= week }
+        return past_weekly_matchups, future_weekly_matchups
+    
     def get_wins(self):
         return { self.roster_ids_to_usernames[roster["roster_id"]]:roster["settings"]["wins"] for roster in self.roster_data }
     
@@ -118,7 +123,6 @@ class SleeperDataCollector:
         
         for week in range(num_weeks):
             week_scores = [(player, weekly_scores[player][week]) for player in weekly_scores]
-            print(week_scores)
 
             for player1, score1 in week_scores:
                 wins = 0
