@@ -73,7 +73,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-sleeperData = SleeperDataCollector()
+LEAGUE_ID = '1124814690363400192'
+
+sleeperData = SleeperDataCollector(LEAGUE_ID)
 
 # Weekly matchups data and raw scores
 ALL_WEEKLY_MATCHUPS, WEEKLY_SCORES = sleeperData.get_all_weekly_matchups_and_scores()
@@ -84,45 +86,19 @@ COMPLETED_WEEKS = CURRENT_WEEK - 1
 PAST_WEEKLY_MATCHUPS = { k:v for k, v in ALL_WEEKLY_MATCHUPS.items() if k < CURRENT_WEEK }
 FUTURE_MATCHUPS = { k:v for k,v in ALL_WEEKLY_MATCHUPS.items() if k >= CURRENT_WEEK }
 
+USERNAMES = sleeperData.get_usernames()
+
 # Actual wins
-ACTUAL_WINS = {
-    'gautamm': 8, 'hooghost': 5, 'WinnableEarth71': 5, 'mabdullahnk': 4,
-    'sangdawg': 4, 'vee11': 4, 'duckwirf': 5, 'Yeef': 4,
-    'KikiQuandarius': 4, 'archhers': 2
-}
+ACTUAL_WINS = sleeperData.get_wins()
 
-# Total fractional records
-TOTAL_FRACTIONAL_RECORDS = {
-    'vee11': '37/81',
-    'WinnableEarth71': '46/81',
-    'hooghost': '56/81',
-    'sangdawg': '41/81',
-    'KikiQuandarius': '26/81',
-    'gautamm': '57/81',
-    'mabdullahnk': '47/81',
-    'duckwirf': '36/81',
-    'Yeef': '37/81',
-    'archhers': '23/81'
-}
-
-# Weekly fractional records
-WEEKLY_FRACTIONAL_RECORDS = {
-    'vee11': [9, 0, 1, 8, 4, 5, 0, 1, 9],
-    'WinnableEarth71': [8, 2, 6, 4, 5, 6, 8, 2, 5],
-    'hooghost': [7, 5, 9, 2, 7, 9, 6, 4, 7],
-    'sangdawg': [6, 4, 8, 6, 1, 1, 9, 0, 6],
-    'KikiQuandarius': [5, 1, 3, 3, 2, 2, 1, 5, 4],
-    'gautamm': [4, 9, 5, 5, 5, 4, 4, 8, 8],
-    'mabdullahnk': [3, 8, 7, 7, 6, 7, 3, 3, 3],
-    'duckwirf': [2, 6, 2, 9, 0, 0, 7, 8, 2],
-    'Yeef': [1, 7, 4, 1, 8, 8, 2, 6, 0],
-    'archhers': [0, 3, 0, 0, 3, 3, 5, 7, 2]
-}
+# Weekly fractional wins (how many teams a team would beat in a given week)
+WEEKLY_FRACTIONAL_WINS = sleeperData.get_weekly_fractional_records(weekly_scores=WEEKLY_SCORES)
 
 # Calculate fractional records
 fractional_records = {}
-for team in TOTAL_FRACTIONAL_RECORDS:
-    wins, losses = map(int, TOTAL_FRACTIONAL_RECORDS[team].split('/'))
+for team, wins in WEEKLY_FRACTIONAL_WINS.items():
+    wins = sum(wins)
+    losses = (COMPLETED_WEEKS * (len(USERNAMES) - 1)) - wins
     win_pct = wins / (wins + losses)
     fractional_records[team] = {
         'record': f"{wins}-{losses}",
@@ -145,12 +121,13 @@ def calculate_enhanced_expected_wins(scores, name):
     adjusted_wins = 0
     
     # Calculate weekly medians
-    for week in range(len(scores)):
+    for week in range(COMPLETED_WEEKS):
+        print(week)
         week_scores = [team_scores[week] for team_scores in WEEKLY_SCORES.values()]
         weekly_medians.append(np.median(week_scores))
         
         # Get fractional score for the week
-        fractional_score = WEEKLY_FRACTIONAL_RECORDS[name][week]
+        fractional_score = WEEKLY_FRACTIONAL_WINS[name][week]
         
         if scores[week] > weekly_medians[week]:
             # Above median: weight by how impressive the performance was
@@ -178,7 +155,7 @@ def calculate_enhanced_luck_score(team_name):
         opponent = get_opponent_for_week(team_name, week + 1, PAST_WEEKLY_MATCHUPS)
         team_score = scores[week]
         opp_score = WEEKLY_SCORES[opponent][week]
-        fractional_score = WEEKLY_FRACTIONAL_RECORDS[team_name][week]
+        fractional_score = WEEKLY_FRACTIONAL_WINS[team_name][week]
         
         won_game = team_score > opp_score
         
@@ -240,16 +217,21 @@ def calculate_performance_score(scores, name):
     mean = np.mean(scores)
     std_dev = np.std(scores)
     
+    print(f"PERFORMANCE: {name}")
     # Base components
     max_avg_points = max(np.mean(team_scores) for team_scores in WEEKLY_SCORES.values())
+    print(f"max avg pts = {max_avg_points}")
     base_points_score = (mean / max_avg_points) * 100
+    print(f"base pts score = {base_points_score}")
     win_score = (ACTUAL_WINS[name] / COMPLETED_WEEKS) * 100
+    print(f"win_score = {win_score}")
     consistency_score = 100 - ((std_dev / 30) * 100)
+    print(f"consistency_score = {consistency_score}")
     
     # Calculate quality of points using fractional data
     weekly_quality_scores = []
-    for week, score in enumerate(scores):
-        fractional_score = WEEKLY_FRACTIONAL_RECORDS[name][week]
+    for week in range(COMPLETED_WEEKS):
+        fractional_score = WEEKLY_FRACTIONAL_WINS[name][week]
         quality_modifier = fractional_score / COMPLETED_WEEKS  # Scale of 0 to 1
         weekly_quality_scores.append(quality_modifier)
     
@@ -424,8 +406,9 @@ st.plotly_chart(fig_wins, use_container_width=True)
 
 # Process total fractional records
 fractional_records = {}
-for team, record in TOTAL_FRACTIONAL_RECORDS.items():
-    wins, losses = map(int, record.split('/'))
+for team, wins in WEEKLY_FRACTIONAL_WINS.items():
+    wins = sum(wins)
+    losses = (COMPLETED_WEEKS * (len(USERNAMES) - 1)) - wins
     fractional_records[team] = {
         'total_wins': wins,
         'total_losses': losses
