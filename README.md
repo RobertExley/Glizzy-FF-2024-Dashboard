@@ -17,7 +17,7 @@ Skip the email signup:
 
 ________
 
-**Current iteration as of 11/06/24**
+**Current iteration as of 11/09/24**
 
 **Updates**
 - Modified expected wins calculations
