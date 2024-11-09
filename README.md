@@ -24,6 +24,15 @@ ________
 - Added League Median line to weekly trend chart
 - Fractional wins used as modifiers for Expected Wins, Luck Score, and Performance Score.
 - Fractional wins visualizer
+- League Fraud & Robbed Cards added
+- complete refactor. there are now three packages -- data_collector, calculator, and renderer (which included plotter and layout). using these will make it way easier to add metrics or anything else in the future and keep developing. developers can just use the functions without thinking about each step. i will add documentation as to what each ones output looks like soon
+- use api calls to future proof -> zero need to manually input any data (other than league ID)
+- can support any sleeper league (see global var in fantasy_dashboard)
+- re-did code logic around fractional records to make it more similar to other metrics
+- way more readable now, broken up into parts
+- fixed some issues with previous data that were a result of manual data entry
+- added requirements.txt and gitignore
+
 ________
 **Model info (WIP. Will complete once the model finds itself in a more optimal place before Week 10)**
 
