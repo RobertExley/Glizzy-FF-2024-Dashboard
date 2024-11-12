@@ -93,8 +93,9 @@ class DashboardUI():
                 </div>
                 <div class="card-section-title">Analysis:</div>
                 <div class="card-text">
-                gautamm represents the clearest case of overperformance in the league. While they maintain a respectable fractional record (56/81) showing some genuine skill, their success is heavily luck-inflated. They've won 2.6 more games than expected - the highest positive deviation in the league. Their perfect record in close games and three below-median wins suggest they're regularly escaping with victories they statistically shouldn't secure. The high standard deviation (29.0) indicates inconsistent performance being masked by fortunate timing.
-                This combination of metrics suggests gautamm's 8-1 record is significantly inflated compared to their true performance level. While they're a good team (as evidenced by their fractional record), they should realistically be closer to 5-4 or 6-3 based on their actual performance quality.
+                gautamm continues to be the league's biggest fraud, even more clearly than before. Despite solid underlying performance (Avg PF: 145.88), their success is heavily luck-inflated. 
+                They've won 2.9 more games than expected - by far the highest positive deviation in the league. Their perfect record in close games (2-0) and three below-median wins suggest they're consistently escaping with victories they statistically shouldn't secure. The high standard deviation (27.5) and "Low" consistency rating indicate wildly inconsistent performance being masked by fortunate timing. 
+                Their 9-1 record, while impressive, is significantly inflated compared to their expected 6-1 performance level.
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -115,9 +116,7 @@ class DashboardUI():
                 </div>
                 <div class="card-section-title">Analysis:</div>
                 <div class="card-text">
-                hooghost presents the strongest case for being "robbed" in the league. They lead in average points scored (150.1) with high consistency (StdDev: 18.6), yet sit at a middling 5-4 record. Their expected wins (6.8) versus actual wins (5.0) shows they're significantly underperforming their true level. The "Very Unlucky" luck score of 28.9 quantifies this misfortune.
-                Their strong fractional record (56/81, tied for best in league) demonstrates they're consistently outperforming most teams, yet their record doesn't reflect this dominance. Their losing record in close games (1-2) further emphasizes how bounces aren't going their way in critical moments.
-                This combination of league-leading scoring, high consistency, and poor luck metrics makes hooghost the clear choice for most "robbed" team. Their 5-4 record severely understates their true performance level, which is more befitting of a 7-2 or 8-1 team.
+                hooghost remains the most robbed team, with an even stronger case through Week 10. They lead the league in scoring (149.41 PPG) with remarkable consistency (High rating, StdDev: 17.8), yet sit at a middling 6-4 record. Their expected wins (7.5) versus actual wins (6.0) shows significant underperformance. Most impressively, they have zero below-median wins, meaning they're consistently performing at a high level. Their strong fractional record (62/90) and "Very Unlucky" luck score (27.3) demonstrate they're consistently outperforming most teams, yet their record doesn't reflect this dominance. Their losing record in close games (1-2) further emphasizes how bounces aren't going their way in critical moments. The 6-4 record severely understates their true performance level, which is more befitting of a 7-3 or 8-2 team..
                 </div>
             </div>
         """, unsafe_allow_html=True)
