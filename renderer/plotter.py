@@ -16,7 +16,7 @@ class DataPlotter:
 
     def create_trend_chart(self):
         fig = go.Figure()
-        
+    
         # Calculate weekly league medians
         weekly_medians = []
         for week in range(self.num_weeks):
@@ -27,15 +27,15 @@ class DataPlotter:
         for team in self.team_metrics:
             scores = self.weekly_scores[team['name']]
             fig.add_trace(go.Scatter(
-                x=list(range(1, 10)),
+                x=list(range(1, self.num_weeks + 1)),
                 y=scores,
                 name=team['name'],
                 mode='lines+markers'
             ))
-        
+    
         # Add league median line
         fig.add_trace(go.Scatter(
-            x=list(range(1, 10)),
+            x=list(range(1, self.num_weeks + 1)),
             y=weekly_medians,
             name='League Median',
             mode='lines',
@@ -46,7 +46,7 @@ class DataPlotter:
             ),
             hovertemplate='Week %{x}<br>League Median: %{y:.1f}<extra></extra>'
         ))
-        
+    
         fig.update_layout(
             title='Scoring Trends by Week',
             xaxis_title='Week',
@@ -61,11 +61,17 @@ class DataPlotter:
                 xanchor="left",
                 x=1.02
             ),
-            margin=dict(r=150)
+            margin=dict(r=150),
+            xaxis=dict(
+                tickmode='linear',  # Show all ticks
+                tick0=1,           # Start at 1
+                dtick=1,           # Show every week
+                tickangle=0        # Horizontal labels
+            )
         )
-        
-        return fig
     
+        return fig
+
     def create_performance_and_expected_wins_chart(self):
         # Performance vs Expected Wins Chart
         fig_wins = go.Figure()
@@ -91,10 +97,9 @@ class DataPlotter:
         )
 
         return fig_wins
-    
+
     def create_fractional_records_chart(self):
         # Sort teams by fractional win percentage
-
         sorted_team_names = sorted(
             [team['name'] for team in self.team_metrics],
             key=lambda name: next(
@@ -123,7 +128,7 @@ class DataPlotter:
         fig_fractional_total.add_trace(go.Bar(
             name='Fractional Losses',
             x=sorted_team_names,
-            y=[f"{team_metrics_dict[team]['fractional_record']['total_losses']}" for team in sorted_team_names],
+            y=[team_metrics_dict[team]['fractional_record']['total_losses'] for team in sorted_team_names],
             marker_color='#ff7f7f',
             text=[f"{team_metrics_dict[team]['fractional_record']['total_losses']}/{total_fractional_games}" for team in sorted_team_names],
             textposition='auto',
