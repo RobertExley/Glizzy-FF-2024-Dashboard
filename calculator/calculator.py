@@ -1,4 +1,5 @@
 import numpy as np
+
 class SleeperMetricsCalculator:
     def __init__(self, weekly_scores, past_weekly_matchups, future_weekly_matchups, fractional_wins, actual_wins):
         self.weekly_scores = weekly_scores
@@ -91,7 +92,7 @@ class SleeperMetricsCalculator:
                     close_games_won += 1
                 else:
                     close_games_lost += 1
-        
+                    
         # Calculate expected wins
         expected_wins = self.calculate_enhanced_expected_wins(team_name)
         wail = self.actual_wins[team_name] - expected_wins
@@ -121,14 +122,12 @@ class SleeperMetricsCalculator:
             'close_games_record': f"{close_games_won}-{close_games_lost}",
             'below_median_wins': below_median_wins
         }
-
     def calculate_performance_score(self, name):
         """Calculate performance score using fractional data as quality modifier"""
         scores = self.weekly_scores[name]
         mean = np.mean(scores)
         std_dev = np.std(scores)
     
-        
         # Base components
         max_avg_points = max(np.mean(team_scores) for team_scores in self.weekly_scores.values())
         base_points_score = (mean / max_avg_points) * 100
@@ -156,10 +155,33 @@ class SleeperMetricsCalculator:
 
     def calculate_future_sos(self, team_name):
         """Calculate strength of future schedule"""
+        # Get available future weeks
+        available_weeks = sorted(self.future_weekly_matchups.keys())
+        if not available_weeks:
+            return {
+                'future_sos': 0,
+                'vs_league_avg': 0,
+                'week_by_week': []
+            }
+        
         future_opponents = []
-        for week in range(10, 15):
-            opponent = self._get_opponent_for_week(team_name, week, self.future_weekly_matchups)
-            future_opponents.append(opponent)
+        week_by_week = []
+        
+        for week in available_weeks:
+            try:
+                opponent = self._get_opponent_for_week(team_name, week, self.future_weekly_matchups)
+                if opponent:
+                    future_opponents.append(opponent)
+                    week_by_week.append((week, opponent, round(np.mean(self.weekly_scores[opponent]), 2)))
+            except KeyError:
+                continue
+        
+        if not future_opponents:
+            return {
+                'future_sos': 0,
+                'vs_league_avg': 0,
+                'week_by_week': []
+            }
         
         opponent_avgs = [np.mean(self.weekly_scores[opp]) for opp in future_opponents]
         league_avg = np.mean([np.mean(scores) for scores in self.weekly_scores.values()])
@@ -167,10 +189,8 @@ class SleeperMetricsCalculator:
         return {
             'future_sos': round(np.mean(opponent_avgs), 2),
             'vs_league_avg': round(np.mean(opponent_avgs) - league_avg, 2),
-            'week_by_week': [(week, opp, round(np.mean(self.weekly_scores[opp]), 2)) 
-                            for week, opp in zip(range(10, 15), future_opponents)]
+            'week_by_week': week_by_week
         }
-
     def calculate_fractional_record(self, name):
         return {
             "total_wins": sum(self.fractional_wins[name]),
@@ -238,7 +258,7 @@ class SleeperMetricsCalculator:
         }
     
     def calculate_metrics_all_teams(self):
-        team_metrics =  [
+        team_metrics = [
             self.calculate_metrics(name) for name, scores in self.weekly_scores.items()
         ]
         team_metrics.sort(key=lambda x: x['perfScore'], reverse=True)
