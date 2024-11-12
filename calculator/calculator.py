@@ -62,8 +62,17 @@ class SleeperMetricsCalculator:
         close_games_won = 0
         close_games_lost = 0
         
+        # Calculate weekly medians once
+        weekly_medians = []
+        for week in range(self.num_weeks):
+            week_scores = [team_scores[week] for team_scores in self.weekly_scores.values()]
+            weekly_medians.append(np.median(week_scores))
+        
         for week in range(self.num_weeks):
             opponent = self._get_opponent_for_week(team_name, week + 1, self.past_weekly_matchups)
+            if not opponent:  # Skip if no opponent (future week)
+                continue
+                
             team_score = scores[week]
             opp_score = self.weekly_scores[opponent][week]
             fractional_score = self.fractional_wins[team_name][week]
@@ -71,7 +80,8 @@ class SleeperMetricsCalculator:
             won_game = team_score > opp_score
             
             if won_game:
-                if team_score < team_median:
+                # Check if this was a below-median win
+                if team_score < weekly_medians[week]:
                     below_median_wins += 1
                     
                 # Quality win analysis
@@ -122,6 +132,7 @@ class SleeperMetricsCalculator:
             'close_games_record': f"{close_games_won}-{close_games_lost}",
             'below_median_wins': below_median_wins
         }
+
     def calculate_performance_score(self, name):
         """Calculate performance score using fractional data as quality modifier"""
         scores = self.weekly_scores[name]
@@ -191,6 +202,7 @@ class SleeperMetricsCalculator:
             'vs_league_avg': round(np.mean(opponent_avgs) - league_avg, 2),
             'week_by_week': week_by_week
         }
+
     def calculate_fractional_record(self, name):
         return {
             "total_wins": sum(self.fractional_wins[name]),
