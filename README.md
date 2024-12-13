@@ -16,3 +16,5 @@ Skip the email signup:
   Just press Enter without typing anything. This will skip the email collection and launch your dashboard
 
 ________
+
+Access online version: https://glizzy-ff.streamlit.app/
