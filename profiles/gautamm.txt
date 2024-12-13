@@ -2,12 +2,9 @@ League Fraud: gautamm (10-4)
 
 	The case for gautamm as the league's biggest fraud rests on the stark disconnect between their actual performance metrics and their impressive 10-4 record. Let's examine the evidence:
 
-Performance vs. Results Disparity
 	Their expected wins calculation of 7.4 suggests they should be a slightly above-average team. Instead, they've secured 10 wins, creating a massive +2.6 WAIL (Wins Above ILuck Level). This is the largest positive WAIL in the league, indicating they've won 2.6 more games than their performance merits.
 
-Inconsistent Scoring Pattern
 	Their mean-median gap of 11.01 points is particularly revealing. This unusually large gap, combined with their league-worst consistency rating and high standard deviation of 29.2, indicates their scoring is extremely volatile. This suggests they're not dominating weekly matchups but rather winning through fortunate timing of their high-scoring weeks.
 
-Lucky Wins 
 The smoking gun lies in their three below-median wins. This means that in three separate weeks, they won despite scoring below the league's median score - a clear indicator of fortunate matchup timing rather than genuine dominance. Their perfect 2-0 record in close games further supports this pattern of fortunate outcomes.
 	The culmination of these factors results in their sky-high luck score of 85.8, among the highest in the league. This quantifiably demonstrates how their record has been significantly inflated by favorable variance rather than genuine performance.
