@@ -2,7 +2,7 @@ League Robbed: hooghost (8-6)
 
 	Hooghost presents a compelling case of a strong team undermined by consistently unfortunate circumstances:
 
-	Their average points for (152.37) and median points for (163.87) are among the league's best, indicating consistently strong scoring. The small mean-median gap of -1.5 and high consistency rating (supported by a reasonable 19.5 StdDev) show this isn't just occasional explosive weeks - it's sustained excellence.
+	Their average points for (152.37) and median points for (153.87) are among the league's best, indicating consistently strong scoring. The small mean-median gap of -1.5 and high consistency rating (supported by a reasonable 19.5 StdDev) show this isn't just occasional explosive weeks - it's sustained excellence.
 
 	With 9.6 expected wins against only 8 actual wins, hooghost has the largest negative differential (-1.6 WAIL) of any competitive team. This suggests they're performing at a level that should have yielded nearly two more wins than they've achieved.
 
