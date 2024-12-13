@@ -1,0 +1,13 @@
+League Robbed: hooghost (8-6)
+
+	Hooghost presents a compelling case of a strong team undermined by consistently unfortunate circumstances:
+
+Superior Performance Metrics
+	Their average points for (152.37) and median points for (163.87) are among the league's best, indicating consistently strong scoring. The small mean-median gap of -1.5 and high consistency rating (supported by a reasonable 19.5 StdDev) show this isn't just occasional explosive weeks - it's sustained excellence.
+
+Expected vs. Actual Performance
+	With 9.6 expected wins against only 8 actual wins, hooghost has the largest negative differential (-1.6 WAIL) of any competitive team. This suggests they're performing at a level that should have yielded nearly two more wins than they've achieved.
+
+Unfortunate Close Game Results
+	Their 1-3 record in close games is particularly telling. In games decided by small margins, they've repeatedly found themselves on the losing end despite their superior scoring ability. Importantly, they have zero below-median wins, meaning every victory they've secured has been earned through genuine good performance rather than luck.
+	The culmination of these factors is reflected in their rock-bottom luck score of 19.2, indicating they've faced the most adverse variance in the league. This comprehensive statistical picture shows a team that's performing at an elite level but has been repeatedly denied the record they deserve through unfortunate timing and close losses.

@@ -1,14 +1,30 @@
 import streamlit as st
+from .manager_profile import ManagerProfile
 
-class DashboardUI():
+class DashboardUI:
     def __init__(self, dataPlotter):
-        st.set_page_config(layout="wide", page_title="Fantasy Football Analytics")
         self._css()
         self.plotter = dataPlotter
         self.team_metrics = dataPlotter.get_team_metrics()
         self.num_weeks = dataPlotter.calculator.get_num_weeks()
 
     def render(self):
+        fig_wins = self.plotter.create_performance_and_expected_wins_chart()
+        st.plotly_chart(fig_wins, use_container_width=True)
+
+        fig_fractional_total = self.plotter.create_fractional_records_chart()
+        st.plotly_chart(fig_fractional_total, use_container_width=True)
+
+        fig_trend_chart = self.plotter.create_trend_chart()
+        st.plotly_chart(fig_trend_chart, use_container_width=True)
+
+        fig_schedule = self.plotter.create_future_schedule_heatmap()
+        st.plotly_chart(fig_schedule, use_container_width=True)
+
+        self._team_cards()
+        self._footer()
+    
+    def _render_dashboard(self):
         st.title('Fantasy Football Analytics Dashboard')
 
         fig_wins = self.plotter.create_performance_and_expected_wins_chart()
@@ -24,9 +40,11 @@ class DashboardUI():
         st.plotly_chart(fig_schedule, use_container_width=True)
 
         self._team_cards()
-        self._title_cards()
         self._footer()
-
+    
+    def _render_manager_profile(self, manager_name):
+        profile = ManagerProfile(self.plotter.calculator, manager_name)
+        profile.render()
     def _team_cards(self):
         for team in self.team_metrics:
             luck_class = (
@@ -74,52 +92,6 @@ class DashboardUI():
                     </div>
                 </div>
             """, unsafe_allow_html=True)
-    def _title_cards(self):
-        fraud_team = max(self.team_metrics, key=lambda x: x['actualWins'] - x['expectedWins'])
-        robbed_team = min(self.team_metrics, key=lambda x: x['actualWins'] - x['expectedWins'])
-
-        # Fraud Card
-        st.markdown(f"""
-            <div class="simple-card fraud-card">
-                <div class="card-title">💩 Current League Fraud Title</div>
-                <div class="card-subtitle">{fraud_team['name']} ({fraud_team['record']}): "The Variance King"</div>
-                <div class="card-section-title">Statistical Evidence:</div>
-                <div class="card-stats">
-                • Expected Wins: {fraud_team['expectedWins']:.1f} vs Actual: {fraud_team['actualWins']} (WAIL: +{fraud_team['wail']:.1f})<br>
-                • Luck Score: {fraud_team['luck_score']:.1f} ({fraud_team['luck_rating']})<br>
-                • Only winning close games ({fraud_team['close_games_record']})<br>
-                • {fraud_team['below_median_wins']} below-median wins<br>
-                • High volatility (StdDev: {fraud_team['weeklyStdDev']:.1f})
-                </div>
-                <div class="card-section-title">Analysis:</div>
-                <div class="card-text">
-                gautamm continues to be the league's biggest fraud, even more clearly than before. Despite solid underlying performance (Avg PF: 145.88), their success is heavily luck-inflated. 
-                They've won 2.9 more games than expected - by far the highest positive deviation in the league. Their perfect record in close games (2-0) and three below-median wins suggest they're consistently escaping with victories they statistically shouldn't secure. The high standard deviation (27.5) and "Low" consistency rating indicate wildly inconsistent performance being masked by fortunate timing. 
-                Their 9-1 record, while impressive, is significantly inflated compared to their expected 6-1 performance level.
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-
-        # Robbed Card
-        st.markdown(f"""
-            <div class="simple-card robbed-card">
-                <div class="card-title">😭 Current League Robbed Title</div>
-                <div class="card-subtitle">{robbed_team['name']} ({robbed_team['record']}): "Mr. Hates Variance"</div>
-                <div class="card-section-title">Statistical Evidence:</div>
-                <div class="card-stats">
-                • League-best Average PF ({robbed_team['avgPF']:.1f})<br>
-                • Expected Wins: {robbed_team['expectedWins']:.1f} vs Actual: {robbed_team['actualWins']} (WAIL: {robbed_team['wail']:.1f})<br>
-                • Luck Score: {robbed_team['luck_score']:.1f} ({robbed_team['luck_rating']})<br>
-                • Losing close games ({robbed_team['close_games_record']})<br>
-                • High Consistency Rating (StdDev: {robbed_team['weeklyStdDev']:.1f})<br>
-                • Strong Fractional Record ({robbed_team['fractional_record']['total_wins']}/{robbed_team['fractional_record']['total_wins'] + robbed_team['fractional_record']['total_losses']})
-                </div>
-                <div class="card-section-title">Analysis:</div>
-                <div class="card-text">
-                hooghost remains the most robbed team, with an even stronger case through Week 10. They lead the league in scoring (149.41 PPG) with remarkable consistency (High rating, StdDev: 17.8), yet sit at a middling 6-4 record. Their expected wins (7.5) versus actual wins (6.0) shows significant underperformance. Most impressively, they have zero below-median wins, meaning they're consistently performing at a high level. Their strong fractional record (62/90) and "Very Unlucky" luck score (27.3) demonstrate they're consistently outperforming most teams, yet their record doesn't reflect this dominance. Their losing record in close games (1-2) further emphasizes how bounces aren't going their way in critical moments. The 6-4 record severely understates their true performance level, which is more befitting of a 7-3 or 8-2 team..
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
 
     def _footer(self):
         st.markdown("""
@@ -131,10 +103,11 @@ class DashboardUI():
                 <p>• Stability Score (0-100) shows performance consistency</p>
             </div>
         """, unsafe_allow_html=True)
+
     def _css(self):
         st.markdown("""
             <style>
-            /* Regular card styles */
+            /* Standard Card Styling */
             .stat-card {
                 padding: 20px;
                 border-radius: 10px;
@@ -165,16 +138,20 @@ class DashboardUI():
                 color: rgba(255, 255, 255, 0.9);
                 margin-bottom: 5px;
             }
+            
+            /* Trend Indicators */
             .trend-improving { color: #4CAF50; }
             .trend-declining { color: #f44336; }
             .trend-stable { color: #FFA726; }
+            
+            /* Luck-based Card Styling */
             .lucky-card { background-color: rgba(255, 99, 99, 0.15); }
             .very-lucky-card { background-color: rgba(255, 99, 99, 0.25); }
             .unlucky-card { background-color: rgba(99, 149, 255, 0.15); }
             .very-unlucky-card { background-color: rgba(99, 149, 255, 0.25); }
             .neutral-card { background-color: rgba(128, 128, 128, 0.15); }
 
-            /* Simple Title Cards Styling */
+            /* Title Cards Styling */
             .simple-card {
                 padding: 20px;
                 border-radius: 8px;
@@ -182,23 +159,19 @@ class DashboardUI():
                 background-color: rgba(0, 0, 0, 0.2);
                 border: 1px solid rgba(255, 255, 255, 0.1);
             }
-
             .fraud-card {
                 border-left: 4px solid rgba(255, 99, 99, 0.5);
             }
-
             .robbed-card {
                 border-left: 4px solid rgba(99, 149, 255, 0.5);
                 margin-top: 30px;
             }
-
             .card-title {
                 font-size: 24px;
                 font-weight: bold;
                 color: white;
                 margin-bottom: 15px;
             }
-
             .card-subtitle {
                 font-size: 18px;
                 color: rgba(255, 255, 255, 0.9);
@@ -206,7 +179,6 @@ class DashboardUI():
                 padding-bottom: 10px;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
-
             .card-section-title {
                 font-size: 16px;
                 font-weight: bold;
@@ -215,7 +187,6 @@ class DashboardUI():
                 text-transform: uppercase;
                 letter-spacing: 1px;
             }
-
             .card-stats {
                 color: rgba(255, 255, 255, 0.9);
                 line-height: 1.8;
@@ -224,7 +195,6 @@ class DashboardUI():
                 border-radius: 6px;
                 font-size: 14px;
             }
-
             .card-text {
                 color: rgba(255, 255, 255, 0.9);
                 line-height: 1.6;
@@ -235,6 +205,32 @@ class DashboardUI():
                 text-align: justify;
             }
 
+            /* Profile Card Styling */
+            .profile-card {
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 8px;
+                padding: 20px;
+                margin: 10px 0;
+                text-align: center;
+            }
+            .profile-card h3 {
+                color: white;
+                margin-bottom: 10px;
+                font-size: 18px;
+            }
+            .big-stat {
+                font-size: 24px;
+                font-weight: bold;
+                color: white;
+                margin: 15px 0;
+            }
+            .stat-detail {
+                color: rgba(255, 255, 255, 0.8);
+                font-size: 14px;
+                margin: 5px 0;
+            }
+
+            /* Footer Styling */
             .footer-text {
                 color: rgba(255, 255, 255, 0.7);
                 font-size: 14px;
