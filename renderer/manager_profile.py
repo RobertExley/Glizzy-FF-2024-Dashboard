@@ -5,24 +5,19 @@ from plotly.subplots import make_subplots
 
 class ManagerProfile:
     def __init__(self, calculator):
-        """Initialize ManagerProfile with calculator instance."""
         self.calculator = calculator
 
     def create_performance_timeline(self, manager_name):
-        """Generate interactive performance timeline visualization."""
-        # Retrieve manager's weekly scores
         weekly_scores = self.calculator.get_weekly_scores()[manager_name]
         num_weeks = len(weekly_scores)
         weeks = list(range(1, num_weeks + 1))
 
-        # Calculate weekly medians
         weekly_medians = []
         all_scores = self.calculator.get_weekly_scores()
         for week in range(num_weeks):
             week_scores = [scores[week] for scores in all_scores.values()]
             weekly_medians.append(np.median(week_scores))
 
-        # Get matchup results and details
         matchup_results = []
         for week in range(num_weeks):
             opponent = None
@@ -40,10 +35,7 @@ class ManagerProfile:
                     })
                     break
 
-        # Create figure
         fig = go.Figure()
-
-        # Add manager's score line
         fig.add_trace(go.Scatter(
             x=weeks,
             y=weekly_scores,
@@ -62,7 +54,6 @@ class ManagerProfile:
             )
         ))
 
-        # Add league median line
         fig.add_trace(go.Scatter(
             x=weeks,
             y=weekly_medians,
@@ -76,13 +67,12 @@ class ManagerProfile:
             hovertemplate="League Median: %{y:.1f}<extra></extra>"
         ))
 
-        # Customize layout with theme-consistent styling
         fig.update_layout(
             title=dict(
                 text=f"{manager_name}'s Weekly Performance",
                 font=dict(size=24)
             ),
-            height=400,  # Fixed height
+            height=400,
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             font_color='white',
@@ -105,7 +95,6 @@ class ManagerProfile:
             margin=dict(t=50, r=20, b=50, l=50)
         )
 
-        # Update y-axis range for better visualization
         scores_range = max(weekly_scores) - min(weekly_scores)
         y_min = min(weekly_scores) - (scores_range * 0.1)
         y_max = max(weekly_scores) + (scores_range * 0.1)
@@ -114,8 +103,6 @@ class ManagerProfile:
         return fig
 
     def render_profile(self, manager_name):
-        """Render complete manager profile with metrics and visualizations."""
-        # Retrieve manager metrics
         metrics = next(
             (team for team in self.calculator.calculate_metrics_all_teams() 
              if team['name'] == manager_name),
@@ -133,40 +120,110 @@ class ManagerProfile:
             config={'displayModeBar': False}
         )
 
-        # Performance Metrics Layout
-        st.subheader("Season Stats")
-        col1, col2, col3, col4, col5, col6 = st.columns(6)
-        
-        with col1:
-            st.metric("Record", metrics['record'])
+        # Define base CSS styles
+        st.markdown('''
+        <style>
+        .stats-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .stats-header {
+            color: #64B5F6;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(100, 181, 246, 0.3);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        .stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(100, 181, 246, 0.3);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        </style>
+        ''', unsafe_allow_html=True)
 
-        with col2:
-            st.metric("Average Points For", f"{metrics['avgPF']:.2f}")
+        # Generate statistics HTML
+        stats_html = f'''
+        <div class="stats-container">
+            <h3 class="stats-header">Season Stats</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Record</span>
+                    <span class="stat-value">{metrics['record']}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Expected Wins</span>
+                    <span class="stat-value">{metrics['expectedWins']:.1f}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">WAIL</span>
+                    <span class="stat-value">{metrics['wail']:.2f}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Fractional Record</span>
+                    <span class="stat-value">{metrics['fractional_record']['total_wins']}/{metrics['fractional_record']['total_wins'] + metrics['fractional_record']['total_losses']}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Average Points For</span>
+                    <span class="stat-value">{metrics['avgPF']:.2f}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Median PF</span>
+                    <span class="stat-value">{metrics['medianPF']:.2f}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Mean-Median Gap</span>
+                    <span class="stat-value">{metrics['mean_median_gap']:.2f}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Below Median Wins</span>
+                    <span class="stat-value">{metrics['below_median_wins']}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Luck Rating</span>
+                    <span class="stat-value">{metrics['luck_rating']}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Consistency</span>
+                    <span class="stat-value">{metrics['consistency']}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Close Games Record</span>
+                    <span class="stat-value">{metrics['close_games_record']}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">StdDev</span>
+                    <span class="stat-value">{metrics['weeklyStdDev']:.1f}</span>
+                </div>
+            </div>
+        </div>
+        '''
 
-        with col3:
-            st.metric("Performance Score", f"{metrics['perfScore']:.1f}")
-
-        with col4:
-            st.metric("Expected Wins", f"{metrics['expectedWins']:.1f}")
-
-        with col5:
-            st.metric("WAIL", f"{metrics['wail']:.2f}")
-
-        with col6:
-            st.metric("Luck Score", f"{metrics['luck_score']:.1f}")
-            
-        # Detailed Statistics
-        st.subheader("Detailed Statistics")
-        col7, col8, col9 = st.columns(3)
-        
-        with col7:
-            st.metric("Consistency Rating", metrics['consistency'])
-            st.metric("Weekly StdDev", f"{metrics['weeklyStdDev']:.1f}")
-            
-        with col8:
-            st.metric("Close Games Record", metrics['close_games_record'])
-            st.metric("Below Median Wins", str(metrics['below_median_wins']))
-
-        with col9:
-            st.metric("Performance Trend", metrics['trend'])
-            st.metric("Trend Stability", f"{metrics['trend_stability']:.1f}")
+        st.markdown(stats_html, unsafe_allow_html=True)
