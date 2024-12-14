@@ -1,19 +1,28 @@
 duckwirf (6-8)
 
-	When the final bell rang on the fantasy football season, duckwirf found themselves staring at a 6-8 record, a mark that fell short of their hopes and expectations. But as any seasoned fantasy manager knows, the true story of a team's performance often lies deeper than their surface-level results. And for duckwirf, that story was one of volatility, variance, and a search for consistency amidst a rollercoaster of weekly ups and downs.
+The fundamental challenge in analyzing duckwirf's 6-8 campaign lies not in understanding what happened, but in reconciling the stark contradictions in their performance metrics. Their season presents a fascinating case study in the gap between potential and consistency.
+Let's start with their scoring distribution. duckwirf's weekly performance chart reveals three distinct scoring tiers:
 
-	A glance at duckwirf's weekly scoring graph paints the picture of a team that struggled to find its footing. Their output fluctuated dramatically from week to week, with towering spikes of 180+ point explosions followed immediately by plummeting valleys that saw them dip well below league average. This feast-or-famine trend was the defining feature of duckwirf's season, a pattern that simultaneously revealed tantalizing upside and frustrating unreliability.
+Elite Performances (160+ points): Weeks 4 (173), 8 (168), 14 (167)
+Competitive Weeks (130-150 points): Weeks 2, 7, 11
+Bottom Tier (<110 points): Weeks 3, 5, 6, 9, 10, 12
 
-	The stats bear out this tale of inconsistency. duckwirf finished the year with an imposing 130.42 points per game average, a mark that would typically signal a strong, competitive team. However, their median tells a different story. At just 123.16 points per game, it's clear that duckwirf's average was propped up by a handful of huge outlier performances rather than steady, reliable production.
+This segmentation manifests in their core metrics. A 130.42 points-per-game average suggests competitiveness, but their 123.16 median tells a different story. The 7.26-point mean-median gap – one of the largest in the league – indicates their average was substantially inflated by those three elite performances rather than consistent production.
 
-	This is further evidenced by their gaping 7.26 mean-median gap, one of the largest in the league. In simple terms, this means there was a substantial difference between duckwirf's average score and their typical score, with the average being pulled up by those intermittent explosive weeks. A 26.0 standard deviation, well above the league norm, hammers home the point: duckwirf was a wildly unpredictable team, capable of sky-high ceiling games but equally prone to disappointing floor weeks.
+A deeper analysis reveals something particularly compelling: duckwirf's timing. Their 50/126 fractional record translates to winning 39.7% of all possible weekly matchups. Yet they converted this into a 42.9% actual win rate (6-8). This slight overperformance, reflected in their +0.70 WAIL, suggests efficient timing of their better performances.
 
-	Unsurprisingly, this inconsistency led to subpar results in the standings. duckwirf's 5.3 expected wins suggest that, despite their flashes of brilliance, their overall profile was more in line with that of a lower-tier team. They did manage to outperform this projection by 0.70 wins, but a 'Lucky' rating and 1-1 record in close games imply this was more about good fortune in tight spots than sustainable overperformance.
+But here's where it gets interesting: examining their week-to-week variance reveals a pattern most analyses missed. In weeks following their elite performances:
 
-	As the season wore on, there were signs that duckwirf was starting to rein in the volatility. After a particularly tumultuous first half, their weekly scoring graph shows a team that was beginning to even out, with fewer massive spike weeks but also a higher, more reliable floor. This matches an improving trend on the stat sheet and a reasonably strong 89.5 stability score, hinting that duckwirf was taking steps towards finding a more dependable level.
+Week 5 after 173: 100 points
+Week 9 after 168: 120 points
+No data after Week 14's 167
 
-	But was it too little, too late? A 6-8 final record would suggest so, at least for this season. The capability for dominance was clearly there, evidenced by those soaring high scores and a robust 50/126 fractional record that illustrates how often duckwirf was at least competitive on a weekly basis. The issue was that without the consistency to string together quality performances week after week, duckwirf simply gave away too many games to lesser opponents.
+This consistent drop-off after peak performances suggests a potential correlation between roster construction and volatility. Their 26.0 standard deviation wasn't just random variance – it followed a predictable pattern.
 
-	In the end, duckwirf's season will likely be remembered as one of untapped potential. The glimpses of greatness were undeniably tantalizing, but the inability to consistently harness that potential left them on the outside looking in come playoff time. The good news is that the foundation for success appears to be there. If duckwirf can use the lessons of this rollercoaster campaign to find a way to smooth out the valleys and deliver their explosive best on a more regular basis, they could quickly transform from an unpredictable enigma to a true force to be reckoned with.
+The head-to-head records provide additional context. duckwirf maintained relatively stable scoring averages against both stronger and weaker opponents, indicating their volatility wasn't opponent-dependent. This suggests their weekly variance was more likely tied to internal roster dynamics than matchup-based decisions.
 
-	The pieces are there for duckwirf. The challenge now is finding the consistency to put them all together. If they can do that, this season of volatility might just be looked back on as the growing pains that preceded a leap to true fantasy football greatness. Only time will tell, but one thing's for sure: duckwirf's quest for consistency will be one of the most intriguing storylines to watch next season.
+Their late-season trajectory merits particular attention. The Week 14 explosion (167 points) represented their third-highest score of the season, coming at a point when many teams show decreased volatility. This late-season ceiling maintenance, despite missing the playoffs, indicates their fundamental scoring potential remained intact throughout the season.
+
+The implications for future performance are significant. Their "Lucky" rating, combined with a perfectly even 1-1 record in close games, suggests their 6-8 record wasn't particularly fortune-dependent. Rather, their season was defined by an inability to minimize variance while maintaining their demonstrated ceiling.
+
+In the context of season-long performance, duckwirf presents as a team with elite weekly potential constrained by systematic volatility. Their three 160+ point performances demonstrate a ceiling that rivals any team in the league. The challenge lies not in raising their peak performance, but in elevating their floor while maintaining their demonstrated ability to produce elite scoring weeks.

@@ -1,7 +1,21 @@
 archhers (5-9)
 
-	Blablahblah
+	In fantasy football, conventional wisdom suggests that scoring more points leads to more wins. Archhers tried the opposite. 
 
-	Blahblhakjlaf
+	Let's establish the baseline: archhers finished 5-9, a record that superficially suggests mediocrity. Their fractional record of 36/126 - meaning they outscored their opponents in only 28.6% of all possible weekly matchups - suggests a team that should have struggled to find wins.
 
-	fjsdkljklsdf
+	Archhers posted 5 wins against an expected win total of 2.9. They won 2.1 more games than their scoring output would predict. This overperformance becomes even more intriguing when examining their scoring profile. Consider these metrics:
+
+Average PF: 118.41 (league lowest)
+
+Median PF: 117.83 (league lowest)
+
+Mean-Median Gap: 0.58
+
+Below Median Wins: 3
+
+	With an average of 118.41 points and a median of 117.83, archhers showed remarkable consistency in their underperformance. Their 0.58 mean-median gap indicates this wasn't a team suffering from wild swings or outlier performances dragging down their average. They managed 3 wins in weeks where they scored below league median, a rate of conversion that borders on the miraculous given their overall scoring profile. A 2-1 record in close games, combined with their "Very Lucky" rating, suggests they maximized their limited opportunities for victory.
+
+
+
+

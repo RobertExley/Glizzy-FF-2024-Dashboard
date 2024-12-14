@@ -1,10 +1,19 @@
 League Fraud: gautamm (10-4)
 
-	The case for gautamm as the league's biggest fraud rests on the stark disconnect between their actual performance metrics and their impressive 10-4 record. Let's examine the evidence:
+	Their 10-4 record and first-seed playoff position suggest dominance. But beneath that record lies a statistical profile that raises significant questions about merit.
 
-	Their expected wins calculation of 7.4 suggests they should be a slightly above-average team. Instead, they've secured 10 wins, creating a massive +2.6 WAIL (Wins Above ILuck Level). This is the largest positive WAIL in the league, indicating they've won 2.6 more games than their performance merits.
+	gautamm was expected to win 7.4 games based on their scoring profile. They won 10. This +2.60 WAIL represents the largest overperformance among all teams.
 
-	Their mean-median gap of 11.01 points is particularly revealing. This unusually large gap, combined with their league-worst consistency rating and high standard deviation of 29.2, indicates their scoring is extremely volatile. This suggests they're not dominating weekly matchups but rather winning through fortunate timing of their high-scoring weeks.
+	Their weekly scoring pattern tells a revealing story:
 
-The smoking gun lies in their three below-median wins. This means that in three separate weeks, they won despite scoring below the league's median score - a clear indicator of fortunate matchup timing rather than genuine dominance. Their perfect 2-0 record in close games further supports this pattern of fortunate outcomes.
-	The culmination of these factors results in their sky-high luck score of 85.8, among the highest in the league. This quantifiably demonstrates how their record has been significantly inflated by favorable variance rather than genuine performance.
+	Week 2: 198 points
+
+	Week 14: 205 points
+
+	Weeks 3-13: Significant volatility with multiple below-median performances
+
+	This feast-or-famine approach manifests in their 29.2 standard deviation - the highest in the league. gautamm wasn't consistently good; they were inconsistently explosive. But as 3 below-median wins (most among playoff teams), perfect 2-0 in close games, and a 11.01 mean-median gap would tell, lucky on their bad days too. 
+
+	The 11.01 point gap between their mean (147.14) and median (136.13) scores is particularly telling. This indicates their average was significantly inflated by those explosive weeks rather than consistent excellence. When they weren't erupting for 190+ points, they were often barely above league average.
+
+	Either way, you don't get points for style. You get them for winning. And whatever the numbers might say about sustainability or merit, gautamm has weaseled his way to the top of the league.
