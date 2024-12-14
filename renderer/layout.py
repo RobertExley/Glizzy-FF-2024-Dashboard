@@ -95,14 +95,69 @@ class DashboardUI:
 
     def _footer(self):
         st.markdown("""
-            <div class="footer-text">
-                <p><strong>Metrics Explanation:</strong></p>
-                <p>• Mean-Median Gap shows scoring distribution skew</p>
-                <p>• Below Median Wins indicates unsustainable success</p>
-                <p>• Trend shows recent performance direction</p>
-                <p>• Stability Score (0-100) shows performance consistency</p>
-            </div>
-        """, unsafe_allow_html=True)
+    <div class="footer-container">
+        <div class="footer-text">
+            <p><strong>Performance Score (perfScore)</strong></p>
+            <p>• Weighted composite of points scored (50% - quality adjusted), actual wins (30%), and consistency (20%)</p>
+            <p>• Points are adjusted by "quality of points" multiplier derived from fractional wins</p>
+            <p>• Provides a holistic assessment of a team's performance level</p>
+            <p>• Higher values indicate stronger overall performance in key areas</p>
+        </div>       
+        <div class="footer-text">                     
+            <p><strong>Enhanced Expected Wins (expectedWins)</strong></p>
+            <p>• Sum of weekly fractional wins with a quality adjustment</p>
+            <p>• Above median scores get a 0.7 base win plus fractional bonus</p>
+            <p>• Below median scores get fractional credit only</p>
+            <p>• Estimates "true" win total based on quality of performance</p>
+            <p>• Compare to actual wins to evaluate over/under performance</p>
+        </div>
+        <div class="footer-text">
+            <p><strong>Wins Above/Below Expectation (WAIL)</strong></p>
+            <p>• Difference between actual wins and enhanced expected wins</p>
+            <p>• Positive values indicate wins above expectation (lucky)</p>
+            <p>• Negative values indicate wins below expectation (unlucky)</p>
+            <p>• Useful for quantifying the impact of luck on a team's record</p>
+        </div>       
+        <div class="footer-text">
+            <p><strong>Consistency Rating & Weekly Standard Deviation</strong></p>
+            <p>• weeklyStdDev: Standard deviation of weekly scores</p>
+            <p>• consistency: 'High' (<= 20), 'Medium' (20-25), 'Low' (> 25)</p>
+            <p>• Measures the variability in a team's weekly performance</p>
+            <p>• Lower stdDev and 'High' consistency imply steady, reliable scoring</p>
+            <p>• High variations make a team's output less predictable week-to-week</p>
+        </div>
+        <div class="footer-text">
+            <p><strong>Performance Trend &amp; Stability</strong></p>
+            <p>• trend: Slope of scores over last 4 weeks</p>
+            <p>&nbsp;&nbsp;- 'Improving' (&gt; 2), 'Declining' (&lt; -2), or 'Stable'</p>
+            <p>• trend_stability: 100 - (CoV of 3wk rolling avg)</p>
+            <p>&nbsp;&nbsp;- CoV = (stdDev / mean) * 100</p>
+            <p>• Identifies if a team is improving, declining, or holding steady</p>
+            <p>• trend_stability quantifies how volatile the trend is</p>
+            <p>• Useful for projecting if recent performance will continue</p>
+        </div>
+        <div class="footer-text">
+            <p><strong>Luck Score & Rating </strong></p>
+            <p>• luck_score: 0-100 composite of luck factors</p>
+            <p>&nbsp;&nbsp;- Base: 50</p>
+            <p>&nbsp;&nbsp;- Quality Wins / Tough Losses: +/- 1-5 each</p>
+            <p>&nbsp;&nbsp;- WAIL: +/- 8 per win above/below expected</p>
+            <p>&nbsp;&nbsp;- Below Median Wins: + 4 each</p>
+            <p>&nbsp;&nbsp;- Close Game Record: +/- 16 * (win% - 50%)</p>
+            <p>• luck_rating: Qualitative rating based on luck_score</p>
+            <p>• Quantifies how lucky or unlucky a team's results have been</p>
+            <p>• Incorporates multiple factors for a comprehensive luck assessment</p>
+        </div>
+        <div class="footer-text">
+            <p><strong>Future Strength of Schedule</strong></p>
+            <p>• future_sos: Average points scored by remaining opponents</p>
+            <p>• future_schedule: List of matchups + opp avg score</p>
+            <p>• Measures the difficulty of a team's remaining schedule</p>
+            <p>• Helpful for predicting how a team's performance may change</p>
+            <p>• Higher future_sos implies a tougher remaining schedule</p>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
     def _css(self):
         st.markdown("""
@@ -231,10 +286,30 @@ class DashboardUI:
             }
 
             /* Footer Styling */
+            .footer-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 20px;
+                padding: 20px;
+                border-radius: 8px;
+            }
             .footer-text {
-                color: rgba(255, 255, 255, 0.7);
-                font-size: 14px;
-                margin-top: 30px;
+                flex-basis: calc(33.33% - 20px);
+                padding: 15px;
+                background-color: rgba(255, 255, 255, 0.05);
+                border-radius: 6px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+            }
+            .footer-text p {
+                margin-bottom: 10px;
+            }
+            .footer-text strong {
+                color: white;
+                font-size: 16px;
+                display: block;
+                margin-bottom: 10px;
             }
             </style>
         """, unsafe_allow_html=True)

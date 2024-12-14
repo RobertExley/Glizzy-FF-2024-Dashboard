@@ -26,6 +26,56 @@ class SleeperMetricsCalculator:
     def get_fractional_wins(self):
         return self.fractional_wins
 
+    def calculate_h2h_records(self, manager_name):
+        """Calculate head-to-head records against each opponent.
+        
+        Args:
+            manager_name (str): Name of the manager to analyze
+            
+        Returns:
+            dict: Dictionary containing win-loss records against each opponent
+        """
+        h2h_records = {}
+        
+        # Initialize records for all opponents
+        for opponent in self.weekly_scores.keys():
+            if opponent != manager_name:
+                h2h_records[opponent] = {
+                    'wins': 0,
+                    'losses': 0,
+                    'total_points_for': 0,
+                    'total_points_against': 0,
+                    'win_pct': 0.0,
+                    'avg_points_for': 0.0,
+                    'avg_points_against': 0.0
+                }
+        
+        # Analyze each week's matchups
+        for week, matchups in self.past_weekly_matchups.items():
+            for matchup in matchups:
+                if manager_name in matchup:
+                    opponent = matchup[0] if matchup[1] == manager_name else matchup[1]
+                    manager_score = self.weekly_scores[manager_name][week-1]
+                    opponent_score = self.weekly_scores[opponent][week-1]
+                    
+                    h2h_records[opponent]['total_points_for'] += manager_score
+                    h2h_records[opponent]['total_points_against'] += opponent_score
+                    
+                    if manager_score > opponent_score:
+                        h2h_records[opponent]['wins'] += 1
+                    else:
+                        h2h_records[opponent]['losses'] += 1
+        
+        # Calculate averages and winning percentage
+        for opponent in h2h_records:
+            total_games = h2h_records[opponent]['wins'] + h2h_records[opponent]['losses']
+            if total_games > 0:
+                h2h_records[opponent]['win_pct'] = h2h_records[opponent]['wins'] / total_games
+                h2h_records[opponent]['avg_points_for'] = h2h_records[opponent]['total_points_for'] / total_games
+                h2h_records[opponent]['avg_points_against'] = h2h_records[opponent]['total_points_against'] / total_games
+            
+        return h2h_records
+
     def calculate_enhanced_expected_wins(self, name):
         """Calculate expected wins using fractional data to weigh performance quality"""
         weekly_medians = []
@@ -166,7 +216,6 @@ class SleeperMetricsCalculator:
 
     def calculate_future_sos(self, team_name):
         """Calculate strength of future schedule"""
-        # Get available future weeks
         available_weeks = sorted(self.future_weekly_matchups.keys())
         if not available_weeks:
             return {

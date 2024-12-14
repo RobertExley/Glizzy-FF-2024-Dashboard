@@ -194,7 +194,7 @@ st.markdown('''
 st.markdown("### Detailed Manager Analysis")
 selected_manager = st.selectbox(
     "Select a manager to view their detailed profile",
-    ["gautamm", "hooghost"],
+    ["archhers","duckwirf", "gautamm", "hooghost", "KikiQuandarius", "mabdullahnk", "vee11", "WinnableEarth71", "Yeef"],
     key="detailed_analysis"
 )
 

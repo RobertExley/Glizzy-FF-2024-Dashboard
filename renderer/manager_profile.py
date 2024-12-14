@@ -102,6 +102,85 @@ class ManagerProfile:
 
         return fig
 
+    def create_h2h_visualization(self, manager_name):
+        h2h_records = self.calculator.calculate_h2h_records(manager_name)
+        
+        # Sort opponents by win percentage
+        sorted_opponents = sorted(
+            h2h_records.items(),
+            key=lambda x: (x[1]['win_pct'], x[1]['avg_points_for']),
+            reverse=True
+        )
+        
+        # Prepare data for visualization
+        opponents = [opp for opp, _ in sorted_opponents]
+        wins = [record['wins'] for _, record in sorted_opponents]
+        losses = [record['losses'] for _, record in sorted_opponents]
+        avg_pf = [record['avg_points_for'] for _, record in sorted_opponents]
+        avg_pa = [record['avg_points_against'] for _, record in sorted_opponents]
+        
+        fig = go.Figure()
+        
+        fig.add_trace(go.Bar(
+            name='Wins',
+            x=opponents,
+            y=wins,
+            marker_color='#22c55e',
+            hovertemplate="Wins: %{y}<br>Win %: %{customdata:.1%}<extra></extra>",
+            customdata=[(w/(w+l)) for w, l in zip(wins, losses)]
+        ))
+        
+        fig.add_trace(go.Bar(
+            name='Losses',
+            x=opponents,
+            y=losses,
+            marker_color='#ef4444',
+            hovertemplate="Losses: %{y}<extra></extra>"
+        ))
+        
+        fig.add_trace(go.Scatter(
+            name='Avg Points For',
+            x=opponents,
+            y=avg_pf,
+            mode='lines+markers',
+            line=dict(color='#64B5F6', width=2),
+            marker=dict(size=8),
+            yaxis='y2',
+            hovertemplate="Avg PF: %{y:.1f}<extra></extra>"
+        ))
+        
+        fig.update_layout(
+            title=f"Head-to-Head Records",
+            barmode='stack',
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font_color='white',
+            height=400,
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            ),
+            yaxis=dict(
+                title="Games",
+                gridcolor='rgba(255,255,255,0.1)',
+                zeroline=False
+            ),
+            yaxis2=dict(
+                title="Average Points",
+                overlaying='y',
+                side='right',
+                gridcolor='rgba(255,255,255,0.1)',
+                zeroline=False
+            ),
+            margin=dict(t=50, r=50, b=50, l=50)
+        )
+        
+        return fig
+
     def render_profile(self, manager_name):
         metrics = next(
             (team for team in self.calculator.calculate_metrics_all_teams() 
@@ -226,4 +305,17 @@ class ManagerProfile:
         </div>
         '''
 
+        # Display statistics HTML
         st.markdown(stats_html, unsafe_allow_html=True)
+        
+        # Add separator
+        st.markdown("""
+            <div style="height: 2px; background: linear-gradient(90deg, rgba(100,181,246,0.2) 0%, rgba(100,181,246,0.8) 50%, rgba(100,181,246,0.2) 100%); margin: 30px 0;"></div>
+        """, unsafe_allow_html=True)
+        
+        # Display H2H visualization
+        st.plotly_chart(
+            self.create_h2h_visualization(manager_name),
+            use_container_width=True,
+            config={'displayModeBar': False}
+        )
